@@ -1050,7 +1050,7 @@ JOBID   USER    STAT  QUEUE      FROM_HOST   EXEC_HOST   JOB_NAME   SUBMIT_TIME
 2637    mclosso PEND  priority   ns01x03                 *115-gfnxd Mar 30 11:08
 ```
 
-From the output of `bjobs -el` we can see the LSF options have taken effect.
+From the output of `bjobs -l` we can see the LSF options have taken effect.
 
 ```
 $ bjobs -l
