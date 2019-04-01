@@ -109,7 +109,7 @@ The following bsub/bmod options are supported. All others are blocked.
 | -n     | Number of pods in a parallel job |
 | -pack  | Submit jobs in a pack |
 | -ptl   | Pending time limit |
-| -q     | SPecify the job queue |
+| -q     | Specify the job queue |
 | -r     | Rerunnable job |
 | -sla   | Job service class |
 | -sp    | Job priority |
