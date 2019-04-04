@@ -24,7 +24,7 @@ The integration enables Kubernetes workload to be scheduled with the following c
 
 The technical preview supports two installation options. One for ICP users and another for LSF users.
 
-Users that want to deploy LSF through ICP should use the ICP CloudPak to install the tech preview. When using the CloudPak installation, IBM Spectrum LSF is installed in the Kubernetes cluster with agents running pods. A persistent volume is used for LSF configuration data.  In this model, it is expected that all workload will run through Kubernetes.  If you plan to use this installation option, please refer to the [README](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/IBM_Spectrum_Computing_Cloud_Pak_Quickstart_Guide.pdf) that comes with the ICP CloudPak.
+Users that want to deploy LSF through ICP should use the ICP CloudPak to install the tech preview. When using the CloudPak installation, IBM Spectrum LSF is installed in the Kubernetes cluster with agents running pods. A persistent volume is used for LSF configuration and working data.  In this model, it is expected that all workload will run through Kubernetes.  If you plan to use this installation option, please refer to the [README](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/IBM_Spectrum_Computing_Cloud_Pak_Quickstart_Guide.pdf) that comes with the ICP CloudPak.
 
 The present README describes the native LSF installation.  In this model, LSF and Kubernetes are deployed in parallel on a set of nodes.  LSF is configured to serve as a scheduler for Kubernetes.  Workload may be run either through Kubernetes, or the LSF execution agents.
 
@@ -206,7 +206,7 @@ All steps should be performed as lsfadmin.
 $ mkdir -p /scratch/lsf-install
 $ cp lsf10.1_lsfinstall_linux_x86_64.tar.Z lsf10.1_lnx310-lib217-x86_64.tar.Z /scratch/lsf-install
 $ cd /scratch/lsf-install
-$ tar zxf lsf10.1_lnx310-lib217-x86_64.tar.Z
+$ tar zxf lsf10.1_lsfinstall_linux_x86_64.tar.Z
 ```
 
 #### 2) Create an installer configuration file.
@@ -278,11 +278,34 @@ lsfcompute2 !        !       1       (kube_name=10.0.1.3)
 End     Host
 ```
 
-#### 7) Configure a kubernetes application profile
+#### 7) Add the kube_name resource to lsf.shared
+
+A string resource names `kube_name` needs to be added to lsf.shared.  The lsf.shared file is quite large.  The snippet below is from the bottom of the file.  This line needs to be added between `Begin Resource` and `End Resource`.
+
+The location of the file is
+```
+/share/lsf/conf/lsf.shared
+```
+
+```
+kube_name  String  ()       ()          (Kubernetes node name)
+```
+Here's an example where the line has been added at the end of the resource section.
+```
+frame      Boolean ()       ()          (Hosts with FrameMaker licence)
+alpha      Boolean ()       ()          (DEC alpha)
+crayxt3    Boolean ()       ()          (Cray XT3 MPI)
+bluegene   Boolean ()       ()          (BLUEGENE)
+kube_name  String  ()       ()          (Kubernetes node name)
+End Resource
+```
+
+
+#### 8) Configure a kubernetes application profile
 
 LSF uses application profiles to specify that a job should run though Kubernetes.  When submitting work to LSF, the LSF job will specify a Kubernetes application profile to declare that the work should be executed by Kubernetes.
 
-##### 7.1) Create a Pod Manifest Template
+##### 8.1) Create a Pod Manifest Template
 
 The templates file can be in any filesystem location that is accessible to LSF. It's recommended to put it in the LSF configuration directory.
 
@@ -299,7 +322,7 @@ spec:
   schedulerName: lsf-submit
   containers:
   - name: container0
-    image: centos
+    image: busybox
     resources:
       limits:
         memory: __MEMORYLIMIT_PLACEHOLDER__
@@ -334,7 +357,7 @@ The following table explains important information about the fields in the templ
 | lsf.ibm.com/jobId: \_\_BATCHID\_PLACEHOLDER\_\_      | This field is required and cannot be changed. |
 | schedulerName: lsf-submit              | This field is required and cannot be changed.|
 | name: container0                       | Any container name can be used.|
-| image: centos                          | Any image can be used.|
+| image: busybox                          | Any image can be used. ICP users should be aware that ICP installs an image security admission controller that could block some images.|
 | memory: \_\_MEMORYLIMIT\_PLACEHOLDER\_\_   | The job's memory limit will be placed in this field. i.e., `bsub -M <memory limit>`. This field isn't required, but if not specified then the container will not have a memory limit.  It isn't required that the value of the parameter is set to `__MEMORYLIMIT_PLACEHOLDER__`. A static value can be specified.|
 | memory: \_\_MEMORYREQUEST\_PLACEHOLDER\_\_ | The amount of memory that the container will use is placed in this field. i.e., `bsub -R "rusage[mem=<memory request>]"`. The same notes from the memory limit also apply to the memory request.  |
 | \_\_COMMAND\_PLACEHOLDER\_\_               | This field is optional. The entire `command` and `args` sections can be removed if the container has its own ENTRYPOINT. If the command and args sections are removed the user will still need to specify a job command when submitting work to LSF, but the command will be ignored. |
@@ -342,7 +365,7 @@ The following table explains important information about the fields in the templ
 | \_\_USER_PLACEHOLDER\_\_                  | This field is optional.  If present, LSF will replace this field with the numeric UID of the job submitter.|
 | \_\_GROUP_PLACEHOLDER\_\_                 | This field is optional. If present, LSF will replace this field with the numeric GID of the job submitter.|
 
-##### 7.2) Create an LSF application profile for the Kubernetes jobs
+##### 8.2) Create an LSF application profile for the Kubernetes jobs
 
 Create the application profile by appending to `lsb.applications`.
 
@@ -358,7 +381,7 @@ End Application
 END
 ```
 
-#### 8) Enable the Kubernetes scheduling module
+#### 9) Enable the Kubernetes scheduling module
 
 Edit the file `lsb.modules` and add the line for `schmod_kubernetes` at the end of the list.
 
@@ -391,7 +414,7 @@ schmod_kubernetes               ()                              ()
 End PluginModule
 ```
 
-#### 9) Start the lsf cluster
+#### 10) Start the lsf cluster
 
 This step needs to be performed on each host in the LSF cluster.
 
@@ -411,7 +434,7 @@ Use `lsid` and `bhosts` to confirm that the core daemons are up and running.
 
 ```
 $ lsid
-IBM Spectrum LSF Standard 10.1.0.7, Dec 18 2018
+IBM Spectrum LSF Standard 10.1.0.6, Dec 18 2018
 Copyright International Business Machines Corp. 1992, 2016.
 US Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 
@@ -472,7 +495,17 @@ LSF will place these environment variables in the container environment.  These 
 - `LSB_JOBID`: The job ID
 - `LSB_TASKID`: The ID of this task in a parallel job.
 
-**Note**: Some of the examples will use the Kubernetes API from within the container to find the IP addresses of pods that are part of the same parallel job.  Recent versions of Kubernetes don't allow API access without configuring a role binding for the service accounts.  To configure this, run these commands:
+#### LSF Control Job
+
+LSF will create a control job that acts as a peer to the workload running in Kubernetes.  The control job is responsible for a few things:
+- It will reserve the resource (cpu and memory) in LSF. The control job prevents pure LSF workload from overloading the compute host.
+- It acts as a proxy for LSF policy actions.  For example, if the job has a runlimit, LSF will use the control job to monitor and take action if the job needs to be killed.
+
+For the tech preview, the control job is literally `sleep 1000000`.  There is an assumption that the sleep command is available in the `$PATH` on the execution host.  If the control job execution fails with the [error code 127](https://www.tldp.org/LDP/abs/html/exitcodes.html), it means that sleep can't be found in the execution environment.  One possible fix is to make sure that the sleep binary exists in both `/bin` and `/usr/bin`.
+
+#### Pod service credential
+
+Some of the examples will use the Kubernetes API from within the container to find the IP addresses of pods that are part of the same parallel job.  Recent versions of Kubernetes don't allow API access without configuring a role binding for the service accounts.  To configure this, run these commands:
 
 ```
 $ echo >> rbac.yaml << END
@@ -538,7 +571,7 @@ for thread in threads:
 
 The number of pods can be requested on the bsub command line. e.g., `bsub -n8 ...` will request 8 pods.  So 8 parameter servers and 8 worker tasks.
 
-#### ClusterSpec and task indices.
+#### ClusterSpec and task indices
 
 The Tensorflow ClusterSpec contains a list of all of the parameter servers and worker tasks in the cluster.
 
