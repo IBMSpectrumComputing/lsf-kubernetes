@@ -18,7 +18,7 @@ The integration enables Kubernetes workload to be scheduled with the following c
 1. Advanced GPU scheduling policies like NVlink affinity.
 2. Resource management policies such as fair share, resource guarantees and limits.
 3. Pod co-scheduling.
-4. Limited support for sharing resources between Kubernetes and LSF.  In this tech preview, Kubernetes isn't aware of any work run purely through LSF.  But LSF is aware of pods that were scheduled outside of LSF.
+4. Kubernetes isn't aware of any work running on shared execution hosts if the work was submitted to LSF and doesn't run in a Kubernetes pod. LSF however is aware of resource used by pods that were submitted outside of LSF, and scheduled outside of LSF.
 
 ### Installation options
 
