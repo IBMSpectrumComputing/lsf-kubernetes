@@ -162,6 +162,15 @@ Before installing LSF, a Kubernetes cluster needs to be up and running.  [IBM Cl
 
 ## Installation
 
+#### Large UDP
+
+LSF uses large UDP packets (> 8k) to send load updates and to determine cluster mastership.  If your network cannot reliably send large UDP packets, LSF can be configured to only use TCP.  If you want to configure this, add these 2 parameters to your `lsf.conf`.  If these parameters are added to a running cluster, all daemons on all hosts must be restarted before it will take affect.
+
+```
+LSF_CALL_LIM_WITH_TCP=Y
+LSF_ANNOUNCE_MASTER_TCP_WAITTIME=0
+```
+
 ### Prepare to install
 
 The following hosts and hostnames are used in the Installation section. These exact hostnames are not required, other hostnames can be used.

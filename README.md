@@ -5,7 +5,6 @@ Features:
 - Advanced GPU scheduling policies like NVlink affinity.
 - Resource management policies such as fairshare, resource guarantees and limits.
 - Pod co-scheduling.
-- Kubernetes isn't aware of any work running on shared execution hosts if the work was submitted to LSF and doesn't run in a Kubernetes pod. LSF however is aware of resource used by pods that were submitted outside of LSF, and scheduled outside of LSF.
 - Parallel job scheduling through Kubernetes.
 
 To download the tech preview, visit the [IBM website](https://epwt-www.mybluemix.net/software/support/trial/cst/programwebsite.wss?siteId=548&tabId=1091&w=1).
