@@ -493,6 +493,18 @@ CONTAINER: kubernetes[template(/share/lsf/conf/lsbatch/cluster0/configdir/kube-t
 
 The daemon batch-driver will log to the file `/share/lsf/log/batch-driver.lsfmaster.log`. The Kubernetes scheduling plugin will log to the file `/share/lsf/log/k8s.lsfmaster.log `. Make sure these two files exist, and that they don't contain any error messages.
 
+The following messages in `batch-driver.log` are not errors, and can be ignored
+```
+Log file created at: 2019/04/11 15:08:54
+Running on machine: hostA
+Binary: Built with gc go1.11.4 for linux/amd64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W0411 15:08:54.608632    2349 options.go:222] Neither --kubeconfig nor --master was specified. Using default API client. This might not work.
+W0411 15:08:54.612947    2349 authorization.go:47] Authorization is disabled
+W0411 15:08:54.612952    2349 authentication.go:55] Authentication is disabled
+I0411 15:08:54.612963    2349 deprecated_insecure_serving.go:49] Serving healthz insecurely on [::]:10501
+```
+
 Note: In this tech preview, the pod manifest template files are not checked for correctness when LSF starts up.  If there are errors in template file the error will be detected when batch-driver creates the pod.  The error will be attached to the job, and the job will go to EXIT status.  An error message will be logged to the batch-driver log file.
 
 
