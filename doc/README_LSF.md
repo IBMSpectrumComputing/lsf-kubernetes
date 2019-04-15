@@ -423,7 +423,21 @@ schmod_kubernetes               ()                              ()
 End PluginModule
 ```
 
-#### 10) Start the lsf cluster
+#### 10) Enable per-task allocation for GPUs
+
+By default, LSF allocates GPUs per host.  In a Kubernetes environment, it makes more sense to allocated them per task.  Run the following command to append the necessary configuration to `lsb.resources`.
+
+```
+cat >> /share/lsf/conf/lsbatch/cluster0/configdir/lsb.resources << END
+
+Begin ReservationUsage
+RESOURCE             METHOD        RESERVE
+ngpus_physical       PER_TASK      N
+End ReservationUsage
+END
+```
+
+#### 11) Start the lsf cluster
 
 This step needs to be performed on each host in the LSF cluster.
 
