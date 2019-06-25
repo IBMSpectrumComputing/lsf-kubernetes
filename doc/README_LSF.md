@@ -50,6 +50,8 @@ These notes only apply to the tech preview.
 
 - Only Nvidia GPUs are supported.
 
+- Currently nvidia-docker must be configured as the [default docker](https://github.com/NVIDIA/nvidia-docker/wiki/Advanced-topics#default-runtime) runtime.
+
 - The [nVidia GPU device plugin](https://github.com/NVIDIA/k8s-device-plugin) cannot be running on any worker node that is shared between LSF and Kubernetes.  To keep things simple, its recommended to not install the nVidia device plugin at all.  The reason for this is because when the device plugin is installed, the kublet will decide which specific GPU on the host to assign to the pod. This will conflict with the decision made by LSF.  LSF will perform the same work done that is done by the GPU device plugin:
   - Hardware detection
   - Assigning which GPUs to make available to the pod by setting the environment variable `NVIDIA_VISIBLE_DEVICES`
