@@ -25,12 +25,11 @@ Advanced scheduling for Kubernetes
 
 - [Bridging HPC and Cloud Native Development with Kubernetes](https://www.hpcwire.com/solution_content/ibm/cross-industry/bridging-hpc-and-cloud-native-development-with-kubernetes/), Khalid Ahmed, 2019-Apr-16, HPCWire
 
-## Download
-
-To download the tech preview, visit the [IBM website](https://epwt-www.mybluemix.net/software/support/trial/cst/programwebsite.wss?siteId=548&tabId=1091&w=1).
+## Support
 
 Support is available on the IBM Cloud Tech public slack.  The channel name is `#icplsf-tp-support`.  To get an invite to the workspace, [click here](http://ibm.biz/BdsHmN).
 
+Support is also available through email to LSF-Inquiry@ca.ibm.com
 
 ## Deployment options
 
@@ -38,6 +37,10 @@ Support is available on the IBM Cloud Tech public slack.  The channel name is `#
 
 A tech preview is available for ICP users. The preview is available until July 1, 2019. For more information about the integration, refer to the [Quick Start Guide](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/IBM_Spectrum_Computing_Cloud_Pak_Quickstart_Guide.pdf).
 
+To download the CloudPak, visit the [IBM website](https://epwt-www.mybluemix.net/software/support/trial/cst/welcomepage.wss?siteId=663&tabId=1346&w=1&p=1).
+
 ### Kubernetes add-on for LSF
 
 A tech preview is available for LSF customers. The preview is available until Nov 30, 2019. For more information about the integration, refer to the [README](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/README_LSF.md).
+
+To download the tech preview, visit the [IBM website](https://epwt-www.mybluemix.net/software/support/trial/cst/programwebsite.wss?siteId=548&tabId=1091&w=1).
