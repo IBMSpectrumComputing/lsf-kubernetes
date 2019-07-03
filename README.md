@@ -35,7 +35,7 @@ Support is also available through email to LSF-Inquiry@ca.ibm.com
 
 ### LSF as a scheduler for ICP/Kubernetes
 
-A tech preview is available for ICP users. The preview is available until Oct 30, 2019. For more information about the integration, refer to the [Quick Start Guide](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/IBM_Spectrum_Computing_Cloud_Pak_Quickstart_Guide.pdf).
+A tech preview is available for ICP users. The preview is available until Oct 31, 2019. For more information about the integration, refer to the [Quick Start Guide](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/IBM_Spectrum_Computing_Cloud_Pak_Quickstart_Guide.pdf).
 
 To download the CloudPak, visit the [IBM website](https://epwt-www.mybluemix.net/software/support/trial/cst/welcomepage.wss?siteId=663&tabId=1346&w=1&p=1).
 
