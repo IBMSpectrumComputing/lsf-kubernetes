@@ -1,0 +1,31 @@
+# This is the template for the job.  It will start 10 pods
+# in the "normal" queue.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sharepod-FSGRP-SEQ
+spec:
+  parallelism: 10
+  completions: 10
+  template:
+    metadata:
+      name: sharepod-FSGRP-SEQ
+      annotations:
+        lsf.ibm.com/fairshareGroup: "FSGRP"
+        lsf.ibm.com/queue: "normal"
+    spec:
+      schedulerName: lsf
+      containers:
+      - name: sharingjob
+        image: ubuntu:latest
+        imagePullPolicy: IfNotPresent
+        command: ["sleep", "60"]
+        resources:
+          requests:
+            cpu: 1
+            memory: 128M
+          limits:
+            cpu: 1
+            memory: 256M
+
+      restartPolicy: Never

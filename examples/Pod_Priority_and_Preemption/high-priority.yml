@@ -1,0 +1,31 @@
+# This is a template for a high priority job.
+# It will start 10 pods in the "priority" queue.
+# Each will run for 60 seoonds
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ppnp-high-SEQ
+spec:
+  parallelism: 10
+  completions: 10
+  template:
+    metadata:
+      name: ppnp-high-SEQ
+      annotations:
+        lsf.ibm.com/queue: "priority"
+    spec:
+      schedulerName: lsf
+      containers:
+      - name: bigjob
+        image: ubuntu:latest
+        imagePullPolicy: IfNotPresent
+        command: ["sleep", "60"]
+        resources:
+          requests:
+            cpu: 1
+            memory: 128M
+          limits:
+            cpu: 1
+            memory: 128M
+
+      restartPolicy: Never

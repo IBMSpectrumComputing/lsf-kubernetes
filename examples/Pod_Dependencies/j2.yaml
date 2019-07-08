@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jdpod-2
+spec:
+  template:
+    metadata:
+      name: jdpod-2
+      annotations:
+        lsf.ibm.com/queue: "normal"
+    spec:
+      schedulerName: lsf
+      containers:
+      - name: bigjob
+        image: ubuntu:latest
+        imagePullPolicy: IfNotPresent
+        command: ["sleep", "300"]
+        resources:
+          requests:
+            cpu: 1
+            memory: 128M
+          limits:
+            cpu: 1
+            memory: 256M
+
+      restartPolicy: Never

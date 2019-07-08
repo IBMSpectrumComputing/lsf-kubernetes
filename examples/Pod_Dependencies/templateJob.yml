@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jdpod-SEQ
+spec:
+  template:
+    metadata:
+      name: jdpod-SEQ
+      annotations:
+        lsf.ibm.com/queue: "night"
+    spec:
+      schedulerName: lsf
+      containers:
+      - name: bigjob
+        image: ubuntu:latest
+        command: ["sleep", "60"]
+        resources:
+          requests:
+            cpu: 1
+            memory: 128M
+          limits:
+            cpu: 1
+            memory: 256M
+
+      restartPolicy: Never
