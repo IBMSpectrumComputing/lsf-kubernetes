@@ -71,7 +71,6 @@ The following LSF features are not supported in the tech preview.
 - bstop
 - Limited support for bkill.  bkill can terminate pods, but not send arbitrary unix signals to the job running inside the pod.
 - LSF job resizing
-- LSF job arrays
 - Data manager
 - License scheduler
 - LSF Multi-Cluster
@@ -314,8 +313,6 @@ kind: Pod
 metadata:
   namespace: default
   name: __NAME_PLACEHOLDER__
-  labels:
-    lsf.ibm.com/jobId: __BATCHID_PLACEHOLDER__
 spec:
   schedulerName: lsf
   containers:
@@ -828,8 +825,6 @@ kind: Pod
 metadata:
   namespace: default
   name: __NAME_PLACEHOLDER__
-  labels:
-    lsf.ibm.com/jobId: __BATCHID_PLACEHOLDER__
 spec:
   schedulerName: lsf
   volumes:
