@@ -1,8 +1,16 @@
 # README for IBM Spectrum Computing LSF-Kubernetes Integration, Tech preview
 
+
 ## Abstract
 
-IBM Spectrum Computing is an advanced scheduler and resource manager for Kubernetes.  It includes a full version of IBM Spectrum LSF.  It utilizes the mature, industry leading, scheduling capabilities of IBM Spectrum LSF to provide the policies needed to run complex applications.  IBM Spectrum LSF is a powerful workload management system for distributed computing environments. IBM Spectrum LSF provides a comprehensive set of intelligent, policy-driven scheduling features that enable you to utilize all of your compute infrastructure resources and ensure optimal application performance.
+IBM Spectrum LSF is a powerful workload management system for distributed computing environments. IBM Spectrum LSF provides a comprehensive set of intelligent, policy-driven scheduling features that enable you to utilize all of your compute infrastructure resources and ensure optimal application performance.
+
+This package provides an integration between LSF and Kubernetes that allows LSF to serve as a scheduler for Kubernetes.
+The integration enables Kubernetes workload to be scheduled with the following capabilities:
+1. Advanced GPU scheduling policies like NVlink affinity and GPU memory based allocations.
+2. Resource management policies such as fair share, resource guarantees and limits.
+3. Pod co-scheduling.
+4. Kubernetes isn't aware of any work running on shared execution hosts if the work was submitted to LSF and doesn't run in a Kubernetes pod. LSF however is aware of resource used by pods that were submitted outside of LSF, and scheduled outside of LSF.
 
 ## Table of Contents
 
@@ -13,20 +21,13 @@ IBM Spectrum Computing is an advanced scheduler and resource manager for Kuberne
 
 ## Introduction
 
-This package provides an integration between LSF and Kubernetes that allows LSF to serve as a scheduler for Kubernetes.
-The integration enables Kubernetes workload to be scheduled with the following capabilities:
-1. Advanced GPU scheduling policies like NVlink affinity.
-2. Resource management policies such as fair share, resource guarantees and limits.
-3. Pod co-scheduling.
-4. Kubernetes isn't aware of any work running on shared execution hosts if the work was submitted to LSF and doesn't run in a Kubernetes pod. LSF however is aware of resource used by pods that were submitted outside of LSF, and scheduled outside of LSF.
-
 ### Installation options
 
 The technical preview supports two installation options. One for ICP users and another for LSF users.
 
-Users that want to deploy LSF through ICP should use the ICP CloudPak to install the tech preview. When using the CloudPak installation, IBM Spectrum LSF is installed in the Kubernetes cluster with agents running pods. A persistent volume is used for LSF configuration and working data.  In this model, it is expected that all workload will run through Kubernetes.  If you plan to use this installation option, please refer to the [README](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/IBM_Spectrum_Computing_Cloud_Pak_Quickstart_Guide.pdf) that comes with the ICP CloudPak.
+ICP users that want to deploy LSF into an ICP environment should use the CloudPak to install the tech preview. When using the CloudPak installation, IBM Spectrum LSF is installed in the Kubernetes cluster with agents running pods. A persistent volume is used for LSF configuration and working data.  In this model, it is expected that all workload will run through Kubernetes.  If you plan to use this installation option, please refer to the [README](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/IBM_Spectrum_Computing_Cloud_Pak_Quickstart_Guide.pdf) that comes with the ICP CloudPak.
 
-The present README describes the native LSF installation.  In this model, LSF and Kubernetes are deployed in parallel on a set of nodes.  LSF is configured to serve as a scheduler for Kubernetes.  Workload may be run either through Kubernetes, or the LSF execution agents.
+The present README is for LSF users. It describes installation of the tech preview into a native LSF installation.  In this model, LSF and Kubernetes are deployed in parallel on a set of nodes.  LSF is configured to serve as a scheduler for Kubernetes.  Workload may be run either through Kubernetes, or the LSF execution agents.
 
 The evaluation period for LSF users runs until Nov 30, 2019.
 
@@ -50,9 +51,9 @@ These notes only apply to the tech preview.
 
 - Only Nvidia GPUs are supported.
 
-- Currently nvidia-docker must be configured as the [default docker](https://github.com/NVIDIA/nvidia-docker/wiki/Advanced-topics#default-runtime) runtime.
+- [nvidia-docker](https://github.com/NVIDIA/nvidia-docker) must be configured as the [default docker](https://github.com/NVIDIA/nvidia-docker/wiki/Advanced-topics#default-runtime) runtime.
 
-- The [nVidia GPU device plugin](https://github.com/NVIDIA/k8s-device-plugin) cannot be running on any worker node that is shared between LSF and Kubernetes.  To keep things simple, its recommended to not install the nVidia device plugin at all.  The reason for this is because when the device plugin is installed, the kublet will decide which specific GPU on the host to assign to the pod. This will conflict with the decision made by LSF.  LSF will perform the same work done that is done by the GPU device plugin:
+- The [nVidia GPU device plugin](https://github.com/NVIDIA/k8s-device-plugin) cannot be running on any Kubernetes worker node that is known to LSF.  To keep things simple, its recommended to not install the nVidia device plugin at all.  The reason for this is because when the device plugin is installed, the kublet will decide which specific GPU on the host to assign to the pod. This will conflict with the decision made by LSF.  LSF will perform the same work done that is done by the GPU device plugin:
   - Hardware detection
   - Assigning which GPUs to make available to the pod by setting the environment variable `NVIDIA_VISIBLE_DEVICES`
 
@@ -89,6 +90,7 @@ The following bsub/bmod options are supported. All others are blocked.
 | -Jd    | Job description |
 | -K     | Wait for the job to complete |
 | -Lp    | License project |
+| -M     | Set a per pod memory limit |
 | -N     | Send email when the job completes |
 | -P     | Project |
 | -Q     | Auto-requeue exit values |
@@ -150,7 +152,7 @@ The following features of the LSF application profile feature are supported
 | PEND_TIME_LIMIT | Specifies the pending time limit for a job. |
 | POST_EXEC | Enables post-execution processing at the application level. |
 | PREEMPT_DELAY | Preemptive jobs will wait the specified number of seconds from the submission time before preempting any low priority preemptable jobs. During the grace period, preemption will not be trigged, but the job can be scheduled and dispatched by other scheduling policies. |
-
+| RES_REQ | Resource requirements used to determine eligible hosts. |
 
 ## Prerequisites
 
@@ -191,11 +193,9 @@ The following hosts and hostnames are used in the Installation section. These ex
 
 This README provides instructions for an accelerated install on a 1 to 3 host cluster.  All hosts in the cluster need access to a shared file system that will hold the LSF binaries, configuration, status files and log files. For details about other ways to install LSF, refer to the [LSF documentation](https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_welcome/lsf_welcome.html).
 
-The shared storage must be configured on the LSF hosts in advance.  This README assumes that the shared storage location is `/share` and that LSF will be installed to `/share/lsf`. The installation is performed on the master host. Since this is a shared installation, there are no additional installation steps on the compute hosts.  Once LSF is installed and configured, the only task to perform on the compute hosts is to start the LSF daemons.
+The shared storage must be configured on the LSF hosts in advance.  This README assumes that the shared storage location is `/share` and that LSF will be installed to `/share/lsf`. This location can be changed to any location that you want. The installation is performed on the master host. Since this is a shared installation, there are no additional installation steps on the compute hosts.  Once LSF is installed and configured, the only task to perform on the compute hosts is to start the LSF daemons.
 
 LSF needs an OS account to serve as the cluster administrator account.  This README uses an account named `lsfadmin`.  The admin account can be any account name, lsfadmin is an example.
-
-Note that since this README was written prior to the time that the final tech preview release candidate was available, some of the output may not be exactly as shown.
 
 ### Installation steps
 
@@ -242,6 +242,10 @@ If a single node cluster is being installed then the line `LSF_ADD_SERVERS` can 
 $ sudo sh lsfinstall -f cluster0.config
 ```
 
+The installer will prompt you to accept the EULA before installing. You must accept it to install the software.
+
+The installer will prompt you to choose which architectures to install.  The options are x86_64 (linux3.10-glibc2.17-x86_64) and Power (linux3.10-glibc2.17-ppc64le).  You can choose either or both.
+
 #### 4) (Optional) configure each host to start LSF when the system boots
 
 ```
@@ -250,12 +254,18 @@ $ sudo sh hostsetup --top /share/lsf -boot=y
 
 If you choose to configure LSF to start at boot time, then hostsetup should be run on the master host and on each compute host.
 
-#### 5) Enable the Kubernetes integration.
+#### 5) Source the cluster configuration.
+
+```
+$ . /share/lsf/conf/profile.lsf
+```
+
+#### 6) Enable the Kubernetes integration.
 
 Enable the integration in lsf.conf
 
 ```
-$ cat >> /share/lsf/conf/lsf.conf << END
+$ cat >> $LSF_ENVDIR/lsf.conf << END
 LSB_KUBE_ENABLE=Y
 LSF_ENABLE_EXTSCHEDULER=Y
 LSB_GPU_NEW_SYNTAX=extend
@@ -274,12 +284,12 @@ $ ls /home/lsfadmin/.kube/config
 
 If the authentication data is in a different location, use the lsf.conf parameter `LSB_KUBE_CONFIG` to tell LSF where to find it.
 
-#### 6) Configure the Kubernetes hostname map in lsf.cluster
+#### 7) Configure the Kubernetes hostname map in lsf.cluster
 
 Often Kubernetes installations use different hostnames than LSF.  For example, IBM Cloud Private uses IP addresses as hostnames.  LSF uses the string resource `kube_name` to configure the Kubernetes nodename.  The example below shows how to configure the Kubernetes nodenames by configuring the kube_name resource in the Hosts section of the lsf.cluster file.
 
 ```
-# /share/lsf/conf/lsf.cluster.cluster0
+# $LSF_ENVDIR/lsf.cluster.cluster0
 
 Begin   Host
 HOSTNAME    model    type    server  RESOURCES
@@ -288,29 +298,6 @@ lsfcompute1 !        !       1       (kube_name=10.0.1.2)
 lsfcompute2 !        !       1       (kube_name=10.0.1.3)
 End     Host
 ```
-
-#### 7) Add the kube_name resource to lsf.shared
-
-A string resource names `kube_name` needs to be added to lsf.shared.  The lsf.shared file is quite large.  The snippet below is from the bottom of the file.  This line needs to be added between `Begin Resource` and `End Resource`.
-
-The location of the file is
-```
-/share/lsf/conf/lsf.shared
-```
-
-```
-kube_name  String  ()       ()          (Kubernetes node name)
-```
-Here's an example where the line has been added at the end of the resource section.
-```
-frame      Boolean ()       ()          (Hosts with FrameMaker licence)
-alpha      Boolean ()       ()          (DEC alpha)
-crayxt3    Boolean ()       ()          (Cray XT3 MPI)
-bluegene   Boolean ()       ()          (BLUEGENE)
-kube_name  String  ()       ()          (Kubernetes node name)
-End Resource
-```
-
 
 #### 8) Configure a kubernetes application profile
 
@@ -321,16 +308,16 @@ LSF uses application profiles to specify that a job should run though Kubernetes
 The templates file can be in any filesystem location that is accessible to LSF. It's recommended to put it in the LSF configuration directory.
 
 ```
-cat >> /share/lsf/conf/lsbatch/cluster0/configdir/kube-template.yaml << END
+cat >> $LSF_ENVDIR/lsbatch/cluster0/configdir/kube-template.yaml << END
 apiVersion: v1
 kind: Pod
 metadata:
-  namespace: lsf
+  namespace: default
   name: __NAME_PLACEHOLDER__
   labels:
     lsf.ibm.com/jobId: __BATCHID_PLACEHOLDER__
 spec:
-  schedulerName: lsf-submit
+  schedulerName: lsf
   containers:
   - name: container0
     image: busybox
@@ -348,7 +335,7 @@ spec:
     - name: NVIDIA_VISIBLE_DEVICES
       valueFrom:
         fieldRef:
-          fieldPath: metadata.annotations['lsf.ibm.com/gpus']
+          fieldPath: metadata.annotations['lsf.ibm.com/gpuAlloc']
   securityContext:
     runAsUser: __USER_PLACEHOLDER__
     runAsGroup: __GROUP_PLACEHOLDER__
@@ -372,7 +359,7 @@ The following table explains important information about the fields in the templ
 | memory: \_\_MEMORYLIMIT\_PLACEHOLDER\_\_   | The job's memory limit will be placed in this field. i.e., `bsub -M <memory limit>`. This field isn't required, but if not specified then the container will not have a memory limit.  It isn't required that the value of the parameter is set to `__MEMORYLIMIT_PLACEHOLDER__`. A static value can be specified.|
 | memory: \_\_MEMORYREQUEST\_PLACEHOLDER\_\_ | The amount of memory that the container will use is placed in this field. i.e., `bsub -R "rusage[mem=<memory request>]"`. The same notes from the memory limit also apply to the memory request.  |
 | \_\_COMMAND\_PLACEHOLDER\_\_               | This field is optional. The entire `command` and `args` sections can be removed if the container has its own ENTRYPOINT. If the command and args sections are removed the user will still need to specify a job command when submitting work to LSF, but the command will be ignored. |
-| NVIDIA\_VISIBLE\_DEVICES                 | This field is used to configure which GPUs the container has access to.  LSF will attach the annotation `lsf.ibm.com/gpus` to the pod at job dispatch time after it allocates the GPU resources for the job. This annotation specifies which specific GPU on the worker node should be made available to the pod. The tech preview only works with Nvidia GPUS. [The nVidia GPU device plugin](https://github.com/NVIDIA/k8s-device-plugin) cannot be running on any worker node that LSF can use to schedule GPU jobs. Please see the relevant section in this README for more details. |
+| NVIDIA\_VISIBLE\_DEVICES                 | This field is used to configure which GPUs the container has access to.  LSF will attach the annotation `lsf.ibm.com/gpuAlloc` to the pod at job dispatch time after it allocates the GPU resources for the job. This annotation specifies which specific GPU on the worker node should be made available to the pod. The tech preview only works with Nvidia GPUS. [The nVidia GPU device plugin](https://github.com/NVIDIA/k8s-device-plugin) cannot be running on any worker node that LSF can use to schedule GPU jobs. Please see the relevant section in this README for more details. |
 | \_\_USER_PLACEHOLDER\_\_                  | This field is optional.  If present, LSF will replace this field with the numeric UID of the job submitter.|
 | \_\_GROUP_PLACEHOLDER\_\_                 | This field is optional. If present, LSF will replace this field with the numeric GID of the job submitter.|
 
@@ -381,7 +368,7 @@ The following table explains important information about the fields in the templ
 Create the application profile by appending to `lsb.applications`.
 
 ```
-$ cat >> /share/lsf/conf/lsbatch/cluster0/configdir/lsb.applications << END
+$ cat >> $LSF_ENVDIR/lsbatch/cluster0/configdir/lsb.applications << END
 
 Begin Application
 NAME = kube
@@ -392,12 +379,14 @@ End Application
 END
 ```
 
+If your installation prefix isn't `/scratch/lsf`, make sure that `lsb.applications` contains the correct path to `kube-template.yaml`.
+
 #### 9) Enable the Kubernetes scheduling module
 
 Edit the file `lsb.modules` and add the line for `schmod_kubernetes` at the end of the list.
 
 ```
-$ cat /share/lsf/conf/lsbatch/cluster0/configdir/lsb.modules
+$ cat $LSF_ENVDIR/lsbatch/cluster0/configdir/lsb.modules
 # Define Scheduler plugins.
 #
 # SCH_PLUGIN specifies the name of a Scheduler plugin.
@@ -409,7 +398,6 @@ $ cat /share/lsf/conf/lsbatch/cluster0/configdir/lsb.modules
 # After editing this file, run "badmin reconfig" to apply your changes.
 
 Begin PluginModule
-SCH_PLUGIN                      RB_PLUGIN                    SCH_DISABLE_PHASES
 schmod_default                  ()                              ()
 schmod_fcfs                     ()                              ()
 schmod_fairshare                ()                              ()
@@ -421,6 +409,8 @@ schmod_preemption               ()                              ()
 schmod_advrsv                   ()                              ()
 schmod_ps                       ()                              ()
 schmod_affinity                 ()                              ()
+#schmod_demand                  ()                              ()
+#schmod_datamgr                 ()                              ()
 schmod_kubernetes               ()                              ()
 End PluginModule
 ```
@@ -430,7 +420,7 @@ End PluginModule
 By default, LSF allocates GPUs per host.  In a Kubernetes environment, it makes more sense to allocated them per task.  Run the following command to append the necessary configuration to `lsb.resources`.
 
 ```
-cat >> /share/lsf/conf/lsbatch/cluster0/configdir/lsb.resources << END
+cat >> $LSF_ENVDIR/lsbatch/cluster0/configdir/lsb.resources << END
 
 Begin ReservationUsage
 RESOURCE             METHOD        RESERVE
@@ -439,12 +429,22 @@ End ReservationUsage
 END
 ```
 
-#### 11) Start the lsf cluster
+#### 11) User Impersonation
+
+When submitting jobs through Kubernetes, LSF will submit a control job to LSF on behalf of the user.  To enable this functionality, LSF must be configured to allow the primary LSF administrator account to impersonate any user.  Run the following commands on all master candidate hosts.  The code below assumes that the OS account of the primary LSF administrator is `lsfadmin`. If your environment is different, update the commands accordingly.
+
+```
+echo 'LSB_IMPERSONATION_USERS="lsfadmin"' > /etc/lsf.sudoers
+chown root /etc/lsf.sudoers
+chmod 500 /etc/lsf.sudoers
+```
+
+
+#### 12) Start the lsf cluster
 
 This step needs to be performed on each host in the LSF cluster.
 
 ```
-$ . /share/lsf/conf/profile.lsf
 $ sudo lsadmin limstartup
 $ sudo lsadmin resstartup
 $ sudo badmin hstartup
@@ -459,7 +459,7 @@ Use `lsid` and `bhosts` to confirm that the core daemons are up and running.
 
 ```
 $ lsid
-IBM Spectrum LSF Standard 10.1.0.6, Dec 18 2018
+IBM Spectrum LSF Standard 10.1.0.6, Jun 21 2019
 Copyright International Business Machines Corp. 1992, 2016.
 US Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 
@@ -507,18 +507,15 @@ CONTAINER: kubernetes[template(/share/lsf/conf/lsbatch/cluster0/configdir/kube-t
 
 #### 4. Check the log files for any error messages
 
-The daemon batch-driver will log to the file `/share/lsf/log/batch-driver.lsfmaster.log`. The Kubernetes scheduling plugin will log to the file `/share/lsf/log/k8s.lsfmaster.log `. Make sure these two files exist, and that they don't contain any error messages.
+The daemon batch-driver will log to the file `$LSF_ENVDIR/batch-driver.lsfmaster.log`. The Kubernetes scheduling plugin will log to the file `/share/lsf/log/kubebridge.lsfmaster.log`. Make sure these two files exist, and that they don't contain any error messages.
 
 The following messages in `batch-driver.log` are not errors, and can be ignored
 ```
-Log file created at: 2019/04/11 15:08:54
-Running on machine: hostA
-Binary: Built with gc go1.11.4 for linux/amd64
-Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
-W0411 15:08:54.608632    2349 options.go:222] Neither --kubeconfig nor --master was specified. Using default API client. This might not work.
-W0411 15:08:54.612947    2349 authorization.go:47] Authorization is disabled
-W0411 15:08:54.612952    2349 authentication.go:55] Authentication is disabled
-I0411 15:08:54.612963    2349 deprecated_insecure_serving.go:49] Serving healthz insecurely on [::]:10501
+W0704 10:29:30.170694   20757 authorization.go:47] Authorization is disabled
+W0704 10:29:30.172411   20757 authentication.go:55] Authentication is disabled
+W0704 10:29:30.170694   20757 authorization.go:47] Authorization is disabled
+W0704 10:29:30.172411   20757 authentication.go:55] Authentication is disabled
+I0704 10:29:30.172424   20757 deprecated_insecure_serving.go:49] Serving healthz insecurely on [::]:10501
 ```
 
 Note: In this tech preview, the pod manifest template files are not checked for correctness when LSF starts up.  If there are errors in template file the error will be detected when batch-driver creates the pod.  The error will be attached to the job, and the job will go to EXIT status.  An error message will be logged to the batch-driver log file.
@@ -526,23 +523,27 @@ Note: In this tech preview, the pod manifest template files are not checked for 
 
 ## Examples
 
-Kubernetes pods that are submitted through Kubernetes use the parameter `schedulerName: lsf` to indicate that the pod wants to be scheduled by LSF.  LSF jobs that will execute as Kubernetes pods use the parameter `schedulerName: lsf-submit`. The batch-driver daemon uses this schedulerName parameter to determine which pods are scheduled by LSF.
+The LSF-Kubernetes integration allows workload to be run in a kubernetes pod.  The work can be submitted to either LSF or to Kubernetes and LSF will schedule the work based on configured LSF policies.
 
-LSF will place these environment variables in the container environment.  These variables can be used by the container to locate the other containers that are part of the same parallel job.
+Kubernetes pods that specify the pod parameter `schedulerName: lsf` will be scheduled by LSF.
+
+If the job is submitted through LSF, then LSF will place these environment variables in the container environment to make it easier to find the other pods in a parallel job. This information is useful when bootstrapping a parallel application.
 - `LSB_JOBID`: The job ID
 - `LSB_TASKID`: The ID of this task in a parallel job.
 
 #### LSF Control Job
 
-LSF will create a control job that acts as a peer to the workload running in Kubernetes.  The control job is responsible for a few things:
-- It will reserve the resource (cpu and memory) in LSF. The control job prevents pure LSF workload from overloading the compute host.
-- It acts as a proxy for LSF policy actions.  For example, if the job has a runlimit, LSF will use the control job to monitor and take action if the job needs to be killed.
+LSF will create a control job that acts as a peer to the workload running in the Kubernetes pod.  The control job is responsible for a few things:
+- It will reserve the resource (cpu, memory, etc) in LSF. The control job prevents pure LSF workload from overloading the compute hosts.
+- It acts as a proxy for LSF policy actions.  For example, if the job has a runlimit, LSF will use the control job to monitor and take action if the job needs to be killed.  When the runlimit expires the Kubernetes pod will be killed.
 
-For the tech preview, the control job is literally `sleep 1000000`.  There is an assumption that the sleep command is available in the `$PATH` on the execution host.  If the control job execution fails with the [error code 127](https://www.tldp.org/LDP/abs/html/exitcodes.html), it means that sleep can't be found in the execution environment.  One possible fix is to make sure that the sleep binary exists in both `/bin` and `/usr/bin`.
+For the tech preview, the control job runs a process on the execution host.  The process is literally `sleep 1000000`.  There is an assumption that the sleep command is available in the `$PATH` on the execution host.  If the control job execution fails with the [error code 127](https://www.tldp.org/LDP/abs/html/exitcodes.html), it means that sleep can't be found in the execution environment.  One possible fix is to make sure that the sleep binary exists in both `/bin` and `/usr/bin`.
 
 #### Pod service credential
 
-Some of the examples will use the Kubernetes API from within the container to find the IP addresses of pods that are part of the same parallel job.  Recent versions of Kubernetes don't allow API access without configuring a role binding for the service accounts.  To configure this, run these commands:
+Some of the examples will use the Kubernetes API from within the container to find the IP addresses of pods that are part of the same parallel job.  Some Kubernetes distributions may not allow API access from the pod service account by default.
+
+If you find that your Kubernetes cluster doesn't allow API access from within a pod, you can enable access to it by running these commands:
 
 ```
 $ echo >> rbac.yaml << END
@@ -579,8 +580,70 @@ END
 $ kubectl apply -f rbac.yaml
 ```
 
-**Note**: The submission environment isn't added into the pod by default.  If you need to capture the submission environment and make it available in the execution environment, use the bsub option `bsub -env all`.  To include just a few environment variables, specify them on the bsub command line. e.g., `bsub -env ENVVAR1=value1`.  Of course, it's also possible to customize the job environment in a script that launches the job.
+**Note**: The submission environment isn't added into the pod by default.  If you need to capture the submission environment and make it available in the execution environment, use the bsub option `bsub -env all`.  To include just a few environment variables, specify them on the bsub command line. e.g., `bsub -env ENVVAR1=value1`.  Of course, it's also possible to customize the job environment in a script that launches the job or in the pod yaml file.
 
+### Submit a sleep job to LSF that runs in a Kubernetes pod
+
+This example uses the LSF application profile that was set up during the installation.  The app profile name is `kube`. Use the command `bapp -l kube` to see the app profile details.
+
+```
+$ bapp -l kube
+
+APPLICATION NAME: kube
+ -- K8S job container
+
+STATISTICS:
+   NJOBS     PEND      RUN    SSUSP    USUSP      RSV
+       0        0        0        0        0        0
+
+PARAMETERS:
+
+CONTAINER: kubernetes[template(/share/lsf/conf/lsbatch/cluster0/configdir/kube-template.yaml)]
+```
+
+When this application profile is used, LSF will use the template `kube-template.yaml` to submit a pod to Kubernetes.  LSF will also call the Kubernetes Bind API to bind the pod to the execution host when LSF has started the job.  The LSF CLI can be used to control the worload running in the pod.
+
+To submit a new job run `bsub`.
+
+```
+$ bsub -app kube sleep 120
+Job <205> is submitted to default queue <normal>.
+```
+
+Check kubernetes to see that a pod has been created for the job.
+
+```
+$ kubectl get pods
+NAME                          READY   STATUS              RESTARTS   AGE
+lsf-205-cluster0-0-0-0        0/1     ContainerCreating   0          21s
+```
+
+Pods that have been created by LSF use a pattern to name the pod.
+
+    lsf-<jobid>-<clustername>-<arrayid>-<taskid>-<seqno>
+
+| Key           | Meaning     |
+| --------------|-------------|
+| jobid         | The Job ID assigned by LSF
+| clustername   | The LSF clustername
+| arrayid       | The index number for LSF array jobs.  Each array instance will run in its own pod.
+| taskid        | The task id of each task in an LSF parallel job.  Each task will run in its own pod.
+| seqno         | The sequence number of the pod.  LSF uses a sequence number to distinguish pods that whose job has been modified with `bmod`.  Any `bmod` operation that changes the pod configuration will cause the sequence number to be incremented, and new pods will be created.  Running pods cannot be modified.   
+
+Once the sleep command exits, the pod will transition to `Completed` and the job will transition to `DONE`.
+
+```
+$ kubectl get pods
+NAME                          READY   STATUS      RESTARTS   AGE
+lsf-205-cluster0-0-0-0        0/1     Completed   0          9m43s
+```
+```
+$ bjobs 205
+JOBID   USER    STAT  QUEUE      FROM_HOST   EXEC_HOST   JOB_NAME   SUBMIT_TIME
+205     mclosso DONE  normal     ns01x03     ns01x01     sleep 120  Jul  4 13:33
+```
+
+LSF will delete the pod from the system when the LSF job is cleaned from LSF.  The default clean period is 1 hour.
 
 ### Distributed TensorFlow "Hello, World"
 
@@ -752,35 +815,14 @@ RUN chmod a+rx /usr/local/bin/kubectl
 
 ##### Create the LSF application profile and pod template
 
-Create an LSF application profile for Tensorflow and reconfigure LSF.
-
-```
-$ cat >> /share/lsf/conf/lsbatch/cluster0/configdir/lsb.applications << END
-
-Begin Application
-NAME = tf
-DESCRIPTION = K8S Tensorflow container
-CONTAINER = kubernetes[template(/share/lsf/conf/lsbatch/cluster0/configdir/tf.yaml)]
-End Application
-END
-
-$ badmin reconfig
-
-Checking configuration files ...
-
-No errors found.
-
-Reconfiguration initiated
-```
-
 Create a pod template for the Tensorflow job.
 
-This pod template will add in a storage volume that holds the example script.  The volume name is `shared-storage`.
+This pod template will add in a storage volume that holds the example script.  The volume name is `shared-storage`.  You may need to modify this part of the pod template to match your local cluster configuration.
 
 The container image needs to include Tensorflow and the python-kubernetes client.
 
 ```
-$ cat /share/lsf/conf/lsbatch/cluster0/configdir/tf.yaml
+$ cat > $LSF_ENVDIR/lsbatch/cluster0/configdir/tf.yaml << END
 apiVersion: v1
 kind: Pod
 metadata:
@@ -789,7 +831,8 @@ metadata:
   labels:
     lsf.ibm.com/jobId: __BATCHID_PLACEHOLDER__
 spec:
-  schedulerName: lsf-submit
+  schedulerName: lsf
+  volumes:
   - name: shared-storage
     hostPath:
       path: /shared
@@ -811,13 +854,38 @@ spec:
     - name: NVIDIA_VISIBLE_DEVICES
       valueFrom:
         fieldRef:
-          fieldPath: metadata.annotations['lsf.ibm.com/gpus']
+          fieldPath: metadata.annotations['lsf.ibm.com/gpuAlloc']
     volumeMounts:
     - name: shared-storage
       mountPath: /shared
   securityContext:
     runAsUser: __USER_PLACEHOLDER__
   restartPolicy: Never
+END
+```
+
+
+Create an LSF application profile for Tensorflow and reconfigure LSF.
+
+```
+$ cat >> $LSF_ENVDIR/lsbatch/cluster0/configdir/lsb.applications << END
+
+Begin Application
+NAME = tf
+DESCRIPTION = K8S Tensorflow container
+CONTAINER = kubernetes[template(/share/lsf/conf/lsbatch/cluster0/configdir/tf.yaml)]
+End Application
+END
+```
+
+```
+$ badmin reconfig
+
+Checking configuration files ...
+
+No errors found.
+
+Reconfiguration initiated
 ```
 
 
@@ -956,7 +1024,7 @@ lsf-2620-clus10fpk5-fvt-0-7-0   0/1     Completed   0          27m
 
 ### Submit work to Kubernetes that will be scheduled by LSF.
 
-LSF can schedule pods created by Kubernetes pod controllers.  In this example, LSF schedules the pods created by the Kubernetes deployment.
+LSF can schedule pods created by Kubernetes pod controllers.  In this example, LSF schedules the pods created by a Kubernetes deployment.
 
 Pod annotations are used to define LSF parameters such as the LSF queue, application profile and job group.  The following tables list these parameters and the corresponding LSF submission option.  These annotations are specified with the pod template, not at the job/deployment/etc level.  Note that there is one exception to this rule.  If using pod co-scheduling to schedule a parallel Kubernetes job, then the options must be specified at the job level.  The next example illustrates pod co-scheduling.
 
