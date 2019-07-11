@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rljob-SEQ
+  annotations:
+    lsf.ibm.com/queue: "normal"
+spec:
+  schedulerName: lsf
+  containers:
+  - name: longjob
+    image: ubuntu:latest
+    imagePullPolicy: IfNotPresent
+    command: ["sleep", "3600"]
+    resources:
+      requests:
+        cpu: 1
+        memory: 128M
+      limits:
+        cpu: 1
+        memory: 256M
+
+  restartPolicy: Never
