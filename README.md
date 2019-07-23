@@ -1,9 +1,42 @@
 
 ![Logos](doc/images/k8s-lsf-logos.png)
 
-# lsf-kubernetes
+# LSF-Kubernetes
 
-Advanced scheduling for Kubernetes
+## Introduction
+LSF-Kubernetes integration delivers three key capabilities:
+* Effectively manages highly variable demands in workloads within a finite supply of resources
+* Provides improved service levels for different consumers and workloads in a shared multitenant environment
+* Optimizes the usage of expensive resources such as general-purpose graphics processing units (GPGPUs) to help ensure that they are allocated the most important work
+
+### Overview
+LSF-Kubernetes integration builds on IBM Spectrum Computing's rich heritage in workload management and orchestration in demanding high performance computing and enterprise environments. With this strong foundation, IBM Spectrum Computing brings a wide range of workload management capabilities that include:
+* Multilevel priority queues and preemption
+* Fairshare among projects and namespaces
+* Resource reservation
+* Dynamic load-balancing
+* Topology-aware scheduling
+* Capabilty to schedule GPU jobs with consideration for CPU or GPU topology
+* Parallel and elastic jobs
+* Time-windows
+* Time-based configuration
+* Advanced reservation
+* Workflows
+* Multi-cluster workload management (roadmap)
+
+### Improved workload prioritization and management
+IBM Spectrum Computing adds robust workload orchestration and prioritization capabilities to Kubernetes environments, such as IBM Cloud Private, or OpenShift. IBM Cloud Private is an application platform for developing and managing on-premises, containerized applications. It is an integrated environment for managing containers that includes the container orchestrator Kubernetes, a private image repository, a management console, and monitoring frameworks.
+While the Kubernetes scheduler employs a basic “first come, first served" method for processing workloads, IBM Spectrum Computing enables organizations to effectively prioritize and manage workloads based on business priorities and objectives. 
+
+### Key capabilities of IBM Spectrum Computing
+**Workload Orchestration**  
+Kubernetes provides effective orchestration of workloads as long as there is capacity. In the public cloud, the environment can usually be enlarged to help ensure that there is always capacity in response to workload demands. However, in an on-premises deployment, resources are ultimately finite. For workloads that dynamically create Kubernetes pods (such as Jenkins, Jupyter Hub, Apache Spark, Tensorflow, ETL, and so on), the default "first come, first served" orchestration policy is not sufficient to help ensure that important business workloads process first or get resources before less important workloads.  The LSF-Kubernetes integration prioritizes access to the resources for key business processes and lower priority workloads are queued until resources can be made available.
+
+**Service Level Management**  
+In a multitenant environment where there is competition for resources, workloads (users, user groups, projects, and namespaces) can be assigned to different service levels that help ensure the right workload gets access to the right resource at the right time. This function prioritizes workloads and allocates a minimum number of resources for each service class. In addition to service levels, workloads can also be subject to prioritization and multilevel fairshare policies, which maintain correct prioritization of workloads within the same Service Level Agreement (SLA). 
+
+**Resource Optimization**
+Environments are rarely homogeneous. There might be some servers with additional memory or some might have GPGPUs or additional capabilities. Running workloads on these servers that do not require those capabilities can block or delay workloads that do require additional functions. IBM Spectrum Computing provides multiple polices such as multilevel fairshare and service level management, enabling the optimization of resources based on business policy rather than by users competing for resources.
 
 ## Features
 - Advanced GPU scheduling policies like NVlink affinity.
