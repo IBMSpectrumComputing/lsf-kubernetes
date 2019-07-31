@@ -47,7 +47,6 @@ Environments are rarely homogeneous. There might be some servers with additional
 - Queue prioritization
 - Scalability / throughput
 - Resource ownership policies
-- License management
 - Integration with LSF add-ons: RTM, Application Center, Process Manager
 
 ## Architecture
