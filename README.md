@@ -51,7 +51,7 @@ Environments are rarely homogeneous. There might be some servers with additional
 
 ## Architecture
 
-![Architecture](doc/images/arch1.png)
+![Architecture](doc/images/arch2.png)
 
 ## Articles and Blogs
 
