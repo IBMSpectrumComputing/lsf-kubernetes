@@ -285,7 +285,7 @@ If the authentication data is in a different location, use the lsf.conf paramete
 
 #### 7) Configure the Kubernetes hostname map in lsf.cluster
 
-Often Kubernetes installations use different hostnames than LSF.  For example, IBM Cloud Private uses IP addresses as hostnames.  LSF uses the string resource `kube_name` to configure the Kubernetes nodename.  The example below shows how to configure the Kubernetes nodenames by configuring the kube_name resource in the Hosts section of the lsf.cluster file.
+Often Kubernetes installations use different hostnames than LSF.  For example, IBM Cloud Private uses IP addresses as hostnames.  LSF uses the string resource `kube_name` to configure the mapping between the LSF hostname and the Kubernete's nodename. The example below shows how to configure the Kubernetes nodenames by configuring the kube_name resource in the Hosts section of the lsf.cluster file.
 
 ```
 # $LSF_ENVDIR/lsf.cluster.cluster0
@@ -297,6 +297,18 @@ lsfcompute1 !        !       1       (kube_name=10.0.1.2)
 lsfcompute2 !        !       1       (kube_name=10.0.1.3)
 End     Host
 ```
+
+**Important:** The value of `kube_name` must exactly match the nodename as shown in the output of the command `kubectl get nodes`.  For example, the following output was used to set the values of kube_name in the LSF cluster file shown above.
+
+```
+$ kubectl get nodes
+NAME          STATUS    ROLES                          AGE       VERSION
+10.0.1.2      Ready     worker                         12d       v1.11.1+icp-ee
+10.0.1.3      Ready     worker                         12d       v1.11.1+icp-ee
+10.0.1.1      Ready     etcd,management,master,proxy   12d       v1.11.1+icp-ee
+```
+
+If Kubernetes uses hostnames rather than IP addresses, then the LSF cluster file should also use hostnames.
 
 #### 8) Configure a kubernetes application profile
 
@@ -801,7 +813,7 @@ Before the example can be run, some things need to be set up.
 
 The container image needs to include Tensorflow and the python kubernetes client.  A compatible image is available on [dockerhub](https://hub.docker.com/r/mclosson/tensorflow).  That image can be used.  If you want to build the image yourself, the instructions follow.  Note that there are additional steps to configure Kubernetes to use a private docker repository. Those steps are not covered in this readme.
 
-The following `Dockerfile` can be used to create your own compatible image.  The `kubectl` binary isn't required. But is useful of the pod needs to be debugged.
+The following `Dockerfile` can be used to create your own compatible image.  The `kubectl` binary isn't required. But is useful if the pod needs to be debugged.
 
 ```
 FROM tensorflow/tensorflow
