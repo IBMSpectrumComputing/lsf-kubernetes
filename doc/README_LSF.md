@@ -308,7 +308,7 @@ NAME          STATUS    ROLES                          AGE       VERSION
 10.0.1.1      Ready     etcd,management,master,proxy   12d       v1.11.1+icp-ee
 ```
 
-If Kubernetes uses hostnames rather than IP addresses, then the LSF cluster file should also use hostnames.
+If Kubernetes uses hostnames rather than IP addresses then the LSF cluster file should also use hostnames.
 
 #### 8) Configure a kubernetes application profile
 
@@ -496,6 +496,8 @@ kube_name                            10.0.1.1       lsfmaster
 kube_name                            10.0.1.2       lsfcompute1
 kube_name                            10.0.1.3       lsfcompute2
 ```
+
+The entries in the `VALUE` column must match the output of the `kubectl get nodes` command.
 
 #### 3. Check that the application profile is available and points the right pod manifest template
 
