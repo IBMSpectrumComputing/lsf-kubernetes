@@ -233,6 +233,8 @@ LSF_ADD_SERVERS="lsfcompute1 lsfcompute2"
 END
 ```
 
+**Important**: If LSF needs to create Kubernetes pods, it will embed the LSF cluster name in the pod name.  The LSF cluster name needs to follow the  Kubernetes pod naming rules.  For example, pod names cannot contain the underscore character.  Pod names must be valid DNS-1123 name.
+
 If a single node cluster is being installed then the line `LSF_ADD_SERVERS` can be omitted.
 
 #### 3) Run the installer
