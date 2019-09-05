@@ -440,7 +440,21 @@ End ReservationUsage
 END
 ```
 
-#### 11) User Impersonation
+#### 11) Disable RELAX_JOB_DISPATCH_ORDER
+
+Make sure that the parameter `RELAX_JOB_DISPATCH_ORDER` is set to `N` in lsb.params. The full path of the file is
+
+```
+$LSF_ENVDIR/lsbatch/cluster0/configdir/lsb.params
+```
+
+Here's an example of the file content after the change.
+
+```
+RELAX_JOB_DISPATCH_ORDER = N # enable relaxed job dispatch order in the cluster
+```
+
+#### 12) User Impersonation
 
 When submitting jobs through Kubernetes, LSF will submit a control job to LSF on behalf of the user.  To enable this functionality, LSF must be configured to allow the primary LSF administrator account to impersonate any user.  Run the following commands on all master candidate hosts.  The code below assumes that the OS account of the primary LSF administrator is `lsfadmin`. If your environment is different, update the commands accordingly.
 
@@ -451,7 +465,7 @@ chmod 500 /etc/lsf.sudoers
 ```
 
 
-#### 12) Start the lsf cluster
+#### 13) Start the lsf cluster
 
 This step needs to be performed on each host in the LSF cluster.
 
