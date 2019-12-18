@@ -65,14 +65,13 @@ Support is also available through email to LSF-Inquiry@ca.ibm.com
 
 ## Deployment options
 
-### LSF as a scheduler for ICP/Kubernetes
+### LSF as a scheduler for Kubernetes
 
-A tech preview is available for ICP users. The preview is available until Oct 31, 2019. For more information about the integration, refer to the [Quick Start Guide](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/IBM_Spectrum_Computing_Cloud_Pak_Quickstart_Guide.pdf).
+A tech preview is available for Kubernetes users. The preview is available until July 1, 2020. For more information about the integration, refer to the [Quick Start Guide](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/IBM_Spectrum_Computing_Cloud_Pak_Quickstart_Guide.pdf).
 
-To download the CloudPak, visit the [IBM website](https://epwt-www.mybluemix.net/software/support/trial/cst/welcomepage.wss?siteId=663&tabId=1346&w=1&p=1).
+To download the package, visit the [IBM website](https://epwt-www.mybluemix.net/software/support/trial/cst/welcomepage.wss?siteId=663&tabId=1346&w=1&p=1).
 
 ### Kubernetes add-on for LSF
 
-A tech preview is available for LSF customers. The preview is available until Nov 30, 2019. For more information about the integration, refer to the [README](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/README_LSF.md).
+LSF users have access to the Kubernetes add-on for LSF in fix pack 9.  LSF users are able to use LSF's **bsub** CLI to submit work, but can also use Kubernetes **kubectl** CLI to submit pods.  Sample pod definitions are included in the Quickstart Guide in the **doc** directory.
 
-To download the tech preview, visit the [IBM website](https://epwt-www.mybluemix.net/software/support/trial/cst/programwebsite.wss?siteId=548&tabId=1091&w=1).

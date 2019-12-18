@@ -1,4 +1,4 @@
-# README for IBM Spectrum Computing LSF-Kubernetes Integration, Tech preview
+# README for IBM Spectrum Computing LSF-Kubernetes Integration
 
 
 ## Abstract
@@ -23,13 +23,17 @@ The integration enables Kubernetes workload to be scheduled with the following c
 
 ### Installation options
 
-The technical preview supports two installation options. One for ICP users and another for LSF users.
+LSF Users should follow the instructions provided in [KnowledgeCenter](https://www.ibm.com/support/knowledgecenter/SSWRJV_10.1.0/lsf_welcome/lsf_kc_kubernetes_connector.html).  Additional information is available in this document and the Quickstart Guide.
 
-ICP users that want to deploy LSF into an ICP environment should use the CloudPak to install the tech preview. When using the CloudPak installation, IBM Spectrum LSF is installed in the Kubernetes cluster with agents running pods. A persistent volume is used for LSF configuration and working data.  In this model, it is expected that all workload will run through Kubernetes.  If you plan to use this installation option, please refer to the [README](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/IBM_Spectrum_Computing_Cloud_Pak_Quickstart_Guide.pdf) that comes with the ICP CloudPak.
+Kubernetes users that want to deploy LSF into a Kubernetes environment should use the Tech Preview to install.
+When using the Tech Preview installation, IBM Spectrum LSF is installed in the Kubernetes cluster with agents running pods. A persistent volume is used for LSF configuration and working data.  In this model, it is expected that all workload will run through Kubernetes.  If you plan to use this installation option, please refer to the [README](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/IBM_Spectrum_Computing_Cloud_Pak_Quickstart_Guide.pdf).
+**The evaluation period for the tech preview is until July 1, 2020.**
 
-The present README is for LSF users. It describes installation of the tech preview into a native LSF installation.  In this model, LSF and Kubernetes are deployed in parallel on a set of nodes.  LSF is configured to serve as a scheduler for Kubernetes.  Workload may be run either through Kubernetes, or the LSF execution agents.
+The present README is for LSF users.  Follow the instructions [here](https://www.ibm.com/support/knowledgecenter/SSWRJV_10.1.0/lsf_welcome/lsf_kc_kubernetes_connector.html) to install it. 
+In this model, LSF and 
+Kubernetes are deployed in parallel on a set of nodes.  LSF is configured 
+to serve as a scheduler for Kubernetes.  Workload may be run either through Kubernetes, or the LSF execution agents.
 
-The evaluation period for LSF users runs until Nov 30, 2019.
 
 ### Support during the tech preview
 
@@ -44,6 +48,9 @@ Please be aware that Slack and Github are public resources.  Any issues and comm
 If using Slack or Github is not an option due to confidentiality or legal concerns. Support can be provided over email.
 
 LSF-Inquiry@ca.ibm.com
+
+LSF 10.1.0.9, or LSF Suite 10.2.0.9 users may go through regular support channels.
+
 
 ### GPU Notes
 
