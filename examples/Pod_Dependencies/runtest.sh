@@ -3,6 +3,10 @@
 OUTFILE=test-output.csv
 rm -rf $OUTFILE
 
+# Namespace for LSF
+NAMESPACE=ibm-lsf-tp
+MASTERPOD=$(kubectl get pods -n ${NAMESPACE} |grep ibm-spectrum-computing-prod-master |awk '{ print $1 }')
+
 clear
 
 echo "This script will create a simple workflow as follows:
@@ -97,7 +101,7 @@ while [ true ]; do
     JDONE=$(grep -c Completed j.tmp 2>/dev/null) 
     JRUN=$(egrep -c 'ContainerCreating|Running' j.tmp 2>/dev/null) 
     JPEND=$(grep -c Pending j.tmp 2>/dev/null) 
-    PDATE=$(kubectl exec $MASTERPOD -- /bin/sh -c "date +%H:%M:%S")
+    PDATE=$(kubectl exec $MASTERPOD -n ${NAMESPACE} -- /bin/sh -c "date +%H:%M:%S")
     NOW=$(date +%H:%M:%S)
     OUT="$JPEND,$JRUN,$JDONE"
     if [ "$OUT" != "$OLDOUT" ]; then

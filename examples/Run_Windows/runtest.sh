@@ -3,7 +3,8 @@
 OUTFILE=test-output.csv
 rm -rf $OUTFILE
 
-MASTERPOD=$(kubectl get pods |grep ibm-spectrum-computing-prod-master |awk '{ print $1 }')
+NAMESPACE=ibm-lsf-tp
+MASTERPOD=$(kubectl get pods -n ${NAMESPACE} |grep ibm-spectrum-computing-prod-master |awk '{ print $1 }')
 
 if [ "$MASTERPOD" = "" ]; then
     echo "Could not locate the master pod.  Looking for a pod name containing"
@@ -27,13 +28,13 @@ The jobs will remain in the pending state till the run window is open
 
 "
 
-PDATE=$(kubectl exec $MASTERPOD -- /bin/sh -c "date")
+PDATE=$(kubectl exec $MASTERPOD -n ${NAMESPACE} -- /bin/sh -c "date")
 NOW=$(date)
 echo "You time is:  $NOW"
 echo "Pod time is:  $PDATE"
 echo ""
 
-RUNWIN=$(kubectl exec $MASTERPOD -- /bin/sh -c ". /etc/profile.d/lsf.sh ;bqueues -l night |grep RUN_WINDOW")
+RUNWIN=$(kubectl exec $MASTERPOD -n ${NAMESPACE} -- /bin/sh -c ". /etc/profile.d/lsf.sh ;bqueues -l night |grep RUN_WINDOW")
 echo "The night queue run window currently has:  $RUNWIN"
 echo "The format is:  opentime-closetime"
 echo "Where the time is expressed as weekday:hour:minute or hour:minute"
@@ -63,7 +64,7 @@ while [ true ]; do
     JDONE=$(grep -c Completed j.tmp 2>/dev/null) 
     JRUN=$(egrep -c 'ContainerCreating|Running' j.tmp 2>/dev/null) 
     JPEND=$(grep -c Pending j.tmp 2>/dev/null) 
-    PDATE=$(kubectl exec $MASTERPOD -- /bin/sh -c "date +%H:%M:%S")
+    PDATE=$(kubectl exec $MASTERPOD -n ${NAMESPACE} -- /bin/sh -c "date +%H:%M:%S")
     NOW=$(date +%H:%M:%S)
     OUT="$JPEND,$JRUN,$JDONE"
     if [ "$OUT" != "$OLDOUT" ]; then
