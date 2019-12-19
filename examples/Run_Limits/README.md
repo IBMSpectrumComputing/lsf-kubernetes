@@ -1,5 +1,7 @@
 # Run Limits
 
+**NOTE:  Unfortunately last minute changes to the Kubernetes integration will prevent this test from running properly.  Look for resolution in future releases.**
+
 Run limits allow you to impose restrictions on how long a pod is allowed to
 run.  When a pod reaches the limit, it is terminated.  This allows resources
 to be freed from pods that are running uncharacteristically long.
