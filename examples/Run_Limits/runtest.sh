@@ -1,9 +1,11 @@
 #!/bin/sh
 
+NAMESPACE=ibm-lsf-tp
+
 OUTFILE=test-output.csv
 rm -rf $OUTFILE
 
-MASTERPOD=$(kubectl get pods |grep ibm-spectrum-computing-prod-master |awk '{ print $1 }')
+MASTERPOD=$(kubectl get pods -n ${NAMESPACE} |grep ibm-spectrum-computing-prod-master |awk '{ print $1 }')
 
 if [ "$MASTERPOD" = "" ]; then
     echo "Could not locate the master pod.  Looking for a pod name containing"
@@ -29,7 +31,7 @@ The jobs will run until the RUNLIMIT is reached and will then be killed
 
 "
 
-RUNLIM=$(kubectl exec $MASTERPOD -- /bin/sh -c ". /etc/profile.d/lsf.sh ;bqueues -l normal |grep RUNLIMIT")
+RUNLIM=$(kubectl exec $MASTERPOD -n ${NAMESPACE} -- /bin/sh -c ". /etc/profile.d/lsf.sh ;bqueues -l normal |grep RUNLIMIT")
 if [ "${RUNLIM}" = "" ]; then
     echo "The normal queue does not have the RUNLIMIT defined."
     echo "Cannot run the test."

@@ -2,7 +2,8 @@
 
 # This script shows the completion rate of the jobs in the system
 
-MASTERPOD=$(kubectl get pods |grep ibm-spectrum-computing-prod-master |awk '{ print $1 }')
+NAMESPACE=ibm-lsf-tp
+MASTERPOD=$(kubectl get pods -n ${NAMESPACE} |grep ibm-spectrum-computing-prod-master |awk '{ print $1 }')
 
 if [ "$MASTERPOD" = "" ]; then
     echo "Could not locate the master pod.  Looking for a pod name containing"
@@ -22,7 +23,7 @@ echo "Time,Priority,Priority-NJobs,Priority-Pend,Priority-Run,Normal,Normal-NJob
 TRUN=0
 while [ true ]; do
     NOW=$(date +%H:%M:%S)
-    BQOUT=$(kubectl exec $MASTERPOD -- /bin/sh -c ". /etc/profile.d/lsf.sh ;bqueues")
+    BQOUT=$(kubectl exec $MASTERPOD -n ${NAMESPACE} -- /bin/sh -c ". /etc/profile.d/lsf.sh ;bqueues")
     IFS=$'\n'
     BQLINES=( $BQOUT )
     OUT="$NOW"
