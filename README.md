@@ -69,7 +69,7 @@ Support is also available through email to LSF-Inquiry@ca.ibm.com
 
 A tech preview is available for Kubernetes users. The preview is available until July 1, 2020. For more information about the integration, refer to the [Quick Start Guide](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/IBM_Spectrum_Computing_Cloud_Pak_Quickstart_Guide.pdf).
 
-To download the package, visit the [IBM website](https://epwt-www.mybluemix.net/software/support/trial/cst/welcomepage.wss?siteId=663&tabId=1346&w=1&p=1).
+To download the package, visit the [IBM website](https://epwt-www.mybluemix.net/software/support/trial/cst/welcomepage.wss?siteId=548&tabId=1091&w=1&_ga=2.248881479.1380170776.1576783491-1713667621.1568643347).
 
 ### Kubernetes add-on for LSF
 
