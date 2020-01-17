@@ -9,7 +9,21 @@ LSF-Kubernetes integration delivers three key capabilities:
 * Provides improved service levels for different consumers and workloads in a shared multitenant environment
 * Optimizes the usage of expensive resources such as general-purpose graphics processing units (GPGPUs) to help ensure that they are allocated the most important work
 
-### Overview
+## Deployment options
+
+### LSF as a scheduler for Kubernetes
+
+Users wanting to have a better scheduler for Kubernetes, or wanting parallel or elastic job support should use the Tech Preview.
+The preview is available until July 1, 2020. For more information about the integration, refer to the [Quick Start Guide](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/IBM_Spectrum_Computing_Cloud_Pak_Quickstart_Guide.pdf).
+
+To download the package, visit the [IBM website](http://ibm.biz/LSFKubernetes).
+
+### Kubernetes add-on for LSF
+
+LSF users have access to the Kubernetes add-on for LSF in fix pack 9.  LSF users are able to use LSF's **bsub** CLI to submit work, but can also use Kubernetes **kubectl** CLI to submit pods.  Sample pod definitions are included in the Quickstart Guide in the **doc** directory.
+
+
+## Overview
 LSF-Kubernetes integration builds on IBM Spectrum Computing's rich heritage in workload management and orchestration in demanding high performance computing and enterprise environments. With this strong foundation, IBM Spectrum Computing brings a wide range of workload management capabilities that include:
 * Multilevel priority queues and preemption
 * Fairshare among projects and namespaces
