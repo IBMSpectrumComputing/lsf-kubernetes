@@ -1,0 +1,116 @@
+#--------------------------------------------------------
+# Copyright IBM Corp. 2020. All rights reserved.
+# US Government Users Restricted Rights - Use, duplication or disclosure
+# restricted by GSA ADP Schedule Contract with IBM Corp.
+#--------------------------------------------------------
+#
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ibm-lsf-operator
+  labels:
+    app.kubernetes.io/name: "ibm-spectrum-lsf"
+    app.kubernetes.io/managed-by: "lsfclusters.lsf.spectrumcomputing.ibm.com"
+    app.kubernetes.io/instance: "lsf"
+    release: "lsf"
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - services
+  - services/finalizers
+  - endpoints
+  - persistentvolumeclaims
+  - events
+  - configmaps
+  - secrets
+  - serviceaccounts
+  - roles
+  - rolebindings
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - security.openshift.io
+  resources:
+  - securitycontextconstraints
+  verbs:
+  - use
+- apiGroups:
+  - route.openshift.io
+  resources:
+  - routes
+  verbs:
+  - list
+  - get
+  - create
+  - update
+  - patch
+- apiGroups:
+  - apps
+  - extensions
+  resources:
+  - deployments
+  - daemonsets
+  - replicasets
+  - statefulsets
+  verbs:
+  - '*'
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  verbs:
+  - get
+  - create
+- apiGroups:
+  - apps
+  resourceNames:
+  - ibm-lsf-operator
+  resources:
+  - deployments/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - replicasets
+  verbs:
+  - get
+- apiGroups:
+  - lsf.spectrumcomputing.ibm.com
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - create
+  - patch
+# Needed to create the role
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - roles
+  - rolebindings
+  - clusterroles
+  - clusterrolebindings
+  verbs:
+  - list
+  - get
+  - create
+  - patch
+  - update
