@@ -37,7 +37,7 @@ spec:
     clustername: mylsf2
 
     # The administrators is a list of usernames that can perform
-    # LSF acministrative functions using the LSF GUI.
+    # LSF administrative functions using the LSF GUI.
     #
     # administrators:
     # - someuser
