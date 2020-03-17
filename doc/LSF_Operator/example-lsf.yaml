@@ -16,15 +16,15 @@ metadata:
 
 spec:
   # Indicate acceptance of the Licenses
-  # The licenses are available from this site: 
+  # The licenses are available from this site:
   #      http://www-03.ibm.com/software/sla/sladb.nsf
   # Use the search option to find IBM Spectrum LSF CE
   licenseAccepted: false
 
-  # This is the namespace to deploy in.  Use the same namespace as the operator
+  # The namespace to deploy in.  Use the same namespace as the LSF operator
   namespace: ibm-lsf-project
 
-  # Provide the name of the service account you wich to use
+  # Provide the name of the service account you wish to use
   serviceAccount: my-new-sa
 
   cluster:
@@ -32,12 +32,17 @@ spec:
     #   lsf           - LSF is deployed as a cluster within K8s
     #   podscheduler  - LSF enhances the pod scheduling capabilities
     #                   of K8s.
-    # NOTE:  The images freely provided support "lsf" only.                  
     lsfrole: lsf
 
     clustername: mylsf2
 
-    # PersistentVolumeClaim (Storage volume) patrameters
+    # The administrators is a list of usernames that can perform
+    # LSF acministrative functions using the LSF GUI.
+    #
+    # administrators:
+    # - someuser
+
+    # PersistentVolumeClaim (Storage volume) parameters
     pvc:
       dynamicStorage: false
       storageClass: ""
@@ -66,26 +71,26 @@ spec:
     # This section is for configuring username resolution
     # The pods will call "authconfig" to setup the authentication
     # It can be used with the authentication schemes that "authconfig"
-    # supports. 
+    # supports.
     #
     # userauth:
-      # Configs are a list of secrets that will be passed to the 
-      # running pod as configuration files.  This is how to pass
-      # certificates to the authentication daemons.  The secret has
-      # a name and value and is created using:
-      #    kubectl create secret generic test-secret --from-literal=filename=filecontents
-      # The actual filename in the pod is the filename from the configs
-      # list below plus the filename from the command above.
+        # Configs are a list of secrets that will be passed to the 
+        # running pod as configuration files.  This is how to pass
+        # certificates to the authentication daemons.  The secret has
+        # a name and value and is created using:
+        #    kubectl create secret generic test-secret --from-literal=filename=filecontents
+        # The actual filename in the pod is the filename from the configs
+        # list below plus the filename from the command above.
       # configs:
       # - name: "test-secret"
-      #   filename: "/etc/test/test-secret"
+        # filename: "/etc/test/test-secret"
 
-      # These are the arguments to invoke the "authconfig" command 
-      # with.  This will generate the needed configuration files.
-      # NOTE:  The "--nostart" arguement will be added.
-      # authconfigargs: "--enableldap --enableldapauth --ldapserver=ldap://172.16.2.2/,ldap://172.16.2.3/ --ldapbasedn=dc=devision,dc=ibm,dc=com --update"
+        # These are the arguments to invoke the "authconfig" command 
+        # with.  This will generate the needed configuration files.
+        # NOTE:  The "--nostart" argument will be added.
+      # authconfigargs: "--enableldap --enableldapauth --ldapserver=ldap://172.16.2.2/,ldap://172.16.2.3/ --ldapbasedn=dc=platformlab,dc=ibm,dc=com --update"
 
-      # List the daemons to start, e.g.  nslcd, and sssd...
+        # List the daemons to start, e.g.  nslcd, and sssd
       # starts:
       # - /usr/sbin/nslcd
 
@@ -125,7 +130,7 @@ spec:
 
     # These are the Memory and CPU allocations for the pod.
     # Set the memory and cpu requests and limits to the same values
-    # to get a guarenteed QoS.
+    # to get a guaranteed QoS.
     resources:
       requests:
         cpu: "1"
@@ -151,7 +156,7 @@ spec:
 
     # Database parameters
     db:
-      image: "ibmcom/mariadb-centos-amd64:10.2.14"
+      image: "mariadb:10.4"
       imagePullPolicy: "IfNotPresent"
       cpu: 250m
       memory: 256M
@@ -171,7 +176,7 @@ spec:
 
     # These are the Memory and CPU allocations for the pod.
     # Set the memory and cpu requests and limits to the same values
-    # to get a guarenteed QoS.
+    # to get a guaranteed QoS.
     resources:
       requests:
         cpu: "2"
@@ -204,9 +209,7 @@ spec:
         - app1
         - app2
 
-      # Define where to get the image from.  The image provided is only a 
-      # sample.  Instructions on building actual images is available from
-      # here:  https://github.com/IBMSpectrumComputing/lsf-kubernetes/tree/master/doc/LSF_Operator
+      # Define where to get the image from
       image: "ibmcom/lsfce-comp:10.1.0.9"
       imagePullPolicy: "Always"
 
@@ -262,32 +265,59 @@ spec:
       # listing '/home' will cause /home from the worker OS to be 
       # mounted in the running container, allowing users to access there
       # home directory (assuming automounter is setup).
-      # NOTE:  Not for OpenShift
       #mountList:
       #  - /home
       #  - /apps
 
-
-    # Create other compute types here to support other applications
-    #- name: "RHEL6"
-    #  description: "Compute pods for RHEL 6 and app3"
-    #  image: "lsf-comp-rhel6:10.1.0.9"
-    #  imagePullPolicy: "Always"
-    #  replicas: 1
-    #  placement:
-    #    includeLabel: ""
-    #    excludeLabel: "excludelsf"
-    #  resources:
-    #    requests:
-    #      cpu: "2"
-    #      memory: "1G"
-    #    limits:
-    #      cpu: "2"
-    #      memory: "1G"
-    #    gpu: "no"
+    # Create other compute types here to support other applications.
+    # - name: "RHEL6"
+    #   description: "Compute pods for Fluent and Nastran"
+    #   image: "lsf-comp-rhel6:10.1.0.9"
+    #   imagePullPolicy: "Always"
+    #   replicas: 1
+    #   placement:
+    #     includeLabel: ""
+    #     excludeLabel: "excludelsf"
+    #   resources:
+    #     requests:
+    #       cpu: "2"
+    #       memory: "1G"
+    #     limits:
+    #       cpu: "2"
+    #       memory: "1G"
+    #     gpu: "no"
       #mountList:
       #  - /home
       #  - /apps
-    #  provider:
-    #    - rhel6
-    #    - app3 
+    #   provider:
+    #     - rhel6
+    #     - nastran
+    #     - fluent
+      
+      
+    # - name: "RHEL6wGPU"
+    #   description: "Compute pods for Fluent and Nastran"
+    #   image: "docker-registry.default.svc:5000/ibm-lsf-project/lsf-comp-rhel6:10.1.0.9"
+    #   imagePullPolicy: "Always"
+    #   replicas: 0
+    #   placement:
+    #     includeLabel: ""
+    #     excludeLabel: "excludelsf"
+    #     tolerateName: ""
+    #     tolerateValue: ""
+    #     tolerateEffect: NoExecute
+    #   resources:
+    #     requests:
+    #       cpu: "2"
+    #       memory: "1G"
+    #     limits:
+    #       cpu: "2"
+    #       memory: "1G"
+    #     gpu: "yes"
+      #mountList:
+      #  - /home
+      #  - /apps
+    #   provider:
+    #     - nastran
+    #     - rhel6
+
