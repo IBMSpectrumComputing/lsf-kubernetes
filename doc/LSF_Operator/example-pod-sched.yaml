@@ -1,0 +1,136 @@
+#--------------------------------------------------------
+# Copyright IBM Corp. 2020. All rights reserved.
+# US Government Users Restricted Rights - Use, duplication or disclosure
+# restricted by GSA ADP Schedule Contract with IBM Corp.
+#--------------------------------------------------------
+#
+apiVersion: lsf.spectrumcomputing.ibm.com/v1beta1
+kind: LSFCluster
+metadata:
+  name: example-pod-sched
+  labels:
+    app.kubernetes.io/name: "ibm-spectrum-lsf"
+    app.kubernetes.io/managed-by: "lsfclusters.lsf.spectrumcomputing.ibm.com"
+    app.kubernetes.io/instance: "lsf"
+    release: "lsf-podscheduler"
+
+spec:
+  # Indicate acceptance of the Licenses
+  # The licenses are available from this site:
+  #      http://www-03.ibm.com/software/sla/sladb.nsf
+  # Use the search option to find IBM Spectrum LSF CE
+  # Indicate acceptance of the Licenses
+  licenseAccepted: false
+
+  # The namespace to deploy in.  Use the same namespace as the LSF operator
+  namespace: ibm-lsf-project
+
+  # Provide the name of the service account you wich to use
+  serviceAccount: ibm-lsf-sa
+
+  cluster:
+    # The operator can deploy lsf in two different modes:
+    #   lsf           - LSF is deployed as a cluster within K8s
+    #   podscheduler  - LSF enhances the pod scheduling capabilities
+    #                   of K8s.
+    lsfrole: podscheduler
+
+    clustername: pod-sched
+
+    # PersistentVolumeClaim (Storage volume) patrameters
+    pvc:
+      dynamicStorage: false
+      storageClass: ""
+      selectorLabel: "lsfvol"
+      selectorValue: "lsfvol"
+      size: "10G"
+
+  master:
+    image: "ibmcom/lsfce-master:10.1.0.9"
+    imagePullPolicy: "Always"
+
+    # The placement variables control how the pods will be placed
+    placement:
+      # includeLabel  - Optional label to apply to hosts that
+      #                 should be allowed to run the compute pod
+      includeLabel: ""
+
+      # excludeLabel  - Is a label to apply to hosts to prevent
+      #                 them from being used to host the compute pod
+      excludeLabel: "excludelsf"
+
+      # Taints can be used to control which nodes are available
+      # to the LSF and Kubernetes scheduler.  If used these
+      # parameters are used to allow the LSF pods to run on
+      # tainted nodes.  When not defined the K8s master nodes
+      # will be used to host the master pod.
+      #
+      #  tolerateName  - Optional name of the taint that has been
+      #                  applied to a node
+      #  tolerateValue - The value given to the taint
+      #  tolerateEffect - The effect of the taint
+      #
+      tolerateName: ""
+      tolerateValue: ""
+      tolerateEffect: NoExecute
+
+    # Define the number of this type of pod you want to have running.
+    # Valid values for a master are 0 or 1.
+    replicas: 1
+
+    # These are the Memory and CPU allocations for the pod.
+    # Set the memory and cpu requests and limits to the same values
+    # to get a guarenteed QoS.
+    resources:
+      requests:
+        cpu: "1"
+        memory: "1G"
+      limits:
+        cpu: "1"
+        memory: "1G"
+
+  # There can be a number of different compute pods running.  Each pod
+  # type supporting different applications.  Define a list of compute
+  # pods and there characteristics here.
+  computes:
+    # This is the start of a specific compute pod type.  The name
+    # given should be short and without spaces
+    - name: "RHEL7"
+
+      # Define where to get the image from
+      image: "ibmcom/lsfce-comp:10.1.0.9" 
+      imagePullPolicy: "Always"
+
+      # The placement variables control how the pods will be placed
+      placement:
+        # includeLabel  - Optional label to apply to hosts that
+        #                 should be allowed to run the compute pod
+        includeLabel: ""
+
+        # excludeLabel  - Is a label to apply to hosts to prevent
+        #                 them from being used to host the compute pod
+        excludeLabel: "excludelsf"
+
+        # Taints can be used to control which nodes are available
+        # to the LSF and Kubernetes scheduler.  If used these
+        # parameters are used to allow the LSF pods to run on
+        # tainted nodes.  When not defined the K8s master nodes
+        # will be used to host the master pod.
+        #
+        #  tolerateName  - Optional name of the taint that has been
+        #                  applied to a node
+        #  tolerateValue - The value given to the taint
+        #  tolerateEffect - The effect of the taint
+        #
+        tolerateName: ""
+        tolerateValue: ""
+        tolerateEffect: NoExecute
+
+      resources:
+        requests:
+          cpu: "200m"
+          memory: "1G"
+        limits:
+          cpu: "200m"
+          memory: "1G"
+

@@ -217,7 +217,7 @@ spec:
                   replicas:
                     type: integer
                     minimum: 0
-                    maximum: 1
+                    maximum: 10
                   placement:
                     properties:
                       includeLabel:

@@ -1,8 +1,12 @@
-#--------------------------------------------------------
-# Copyright IBM Corp. 2020. All rights reserved.
-# US Government Users Restricted Rights - Use, duplication or disclosure
+##############################################################################
+# Licensed Materials - Property of IBM.
+# Copyright IBM Corporation 2019. All Rights Reserved.
+# U.S. Government Users Restricted Rights - Use, duplication or disclosure
 # restricted by GSA ADP Schedule Contract with IBM Corp.
-#--------------------------------------------------------
+#
+# Contributors:
+#  IBM Corporation - initial version
+###############################################################################
 #
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
@@ -50,7 +54,6 @@ requiredDropCapabilities:
 - NET_RAW
 - SYS_CHROOT
 - SETFCAP
-- AUDIT_WRITE
 - FOWNER
 - FSETID
 runAsUser:
@@ -61,8 +64,8 @@ seccompProfiles:
 - '*'
 supplementalGroups:
   type: RunAsAny
-users:
-- system:admin
 volumes:
 - '*'
-
+users:
+- system:admin
+- system:serviceaccount:MyNameSpace:ibm-lsf-operator
