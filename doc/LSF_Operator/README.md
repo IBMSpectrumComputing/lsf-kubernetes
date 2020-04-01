@@ -3,31 +3,109 @@
 # IBM Spectrum LSF
 
 ## Introduction
-IBM Spectrum LSF (LSF) is a powerful workload management platform for demanding, distributed HPC environments. It provides a comprehensive set of intelligent, policy-driven scheduling features that enables full utilization of your compute infrastructure resources and ensure optimal application performance.
+IBM Spectrum LSF (LSF) is a powerful workload management platform for demanding, distributed HPC environments. 
+It provides a comprehensive set of intelligent, policy-driven scheduling features that enables full utilization 
+of your compute infrastructure resources and ensure optimal application performance.
+
+**NOTE:  This is a technical preview.  It will expire September 30th, 2020**
 
 ### Overview
-LSF is deployed by the LSF Operator.  The LSF Operator is capable of deploying fully functional LSF clusters on Kubernetes.
-The LSF operator can install LSF or LSF Community Edition (CE).  LSF CE is a free version of LSF.  The unrestricted version is also available.  Email:  LSF-Inquiry@ca.ibm.com  for more information.
+LSF Technical Preview builds on IBM Spectrum Computings rich heritage in workload management and 
+orchestration in demanding high performance computing and enterprise environments. 
+With this strong foundation, LSF Technical Preview brings a wide range of workload management capabilities that include:
+* Multilevel priority queues and preemption
+* Fairshare among projects and namespaces
+* Resource reservation
+* Dynamic load-balancing
+* Topology-aware scheduling
+* Capability to schedule GPU jobs with consideration for CPU or GPU topology
+* Parallel and elastic jobs
+* Time-windows
+* Time-based configuration
+* Advanced reservation
+* Workflows
 
-The LSF cluster can support multiple Linux OS's, and tools are provided [here](https://github.com/IBMSpectrumComputing/lsf-kubernetes) to assist in building custom images to support your workloads.
+LSF is deployed by the LSF Operator.  The LSF Operator is capable of deploying fully functional LSF clusters on Kubernetes, 
+or it can deploy a modified LSF cluster that provides enhanced scheduling capabilities in Kubernetes including parallel job support.
+The LSF operator will install LSF Community Edition (CE).  LSF CE is a free version of LSF.  
+A unrestricted version is also available.  Email:  LSF-Inquiry@ca.ibm.com  for more information.
+
+
+#### LSF on Kubernetes
+LSF is a powerful workload management system for distributed computing environments. 
+LSF provides a comprehensive set of intelligent, policy-driven scheduling features that enable you to utilize 
+all of your compute infrastructure resources and ensure optimal application performance.
+
+The LSF Operator can deploy multiple LSF CE clusters on Kubernetes.  The LSF Cluster also includes a restricted version of LSF Application Center.  
+Application Center provides a Graphical User Interface (GUI) that users can use to submit and manage jobs.  
+Once deployed users can login to the GUI using there normal UNIX account.  
+There home directories and application directories are made available so users can easily run the applications they want.     
+
+The LSF cluster can support multiple Linux OS's, and tools are provided [here](https://github.com/IBMSpectrumComputing/lsf-kubernetes) 
+to assist in building custom images to support your applications.
+
+
+#### Enhanced Pod Scheduler
+The Enhanced pod scheduler deployment of LSF Technical Preview adds robust workload orchestration and prioritization capabilities to Kubernetes clusters. 
+Kubernetes provides an application platform for developing and managing on-premises, containerized applications. 
+While the Kubernetes scheduler employs a basic “first come, first served" method for processing workloads,
+LSF enables organizations to effectively prioritize and manage workloads based on business priorities and objectives. 
+It provide the following key capabilities:
+
+##### Workload Orchestration  
+Kubernetes provides effective orchestration of workloads as long as there is capacity. 
+In the public cloud, the environment can usually be enlarged to help ensure that there is always capacity in response to workload demands. 
+However, in an on-premises deployment of Kubernetes, resources are ultimately finite. 
+For workloads that dynamically create Kubernetes pods (such as Jenkins, Jupyter Hub, Apache Spark, Tensorflow, ETL, and so on), 
+the default "first come, first served" orchestration policy is not sufficient to help ensure that important business workloads process first or get resources before less important workloads. 
+LSF Technical Preview prioritizes access to the resources for key business processes and lower priority workloads are queued until resources can be made available.
+
+##### Service Level Management
+In a multitenant environment where there is competition for resources, workloads (users, user groups, projects, and namespaces) can 
+be assigned to different service levels that help ensure the right workload gets access to the right resource at the right time. 
+This function prioritizes workloads and allocates a minimum number of resources for each service class. 
+In addition to service levels, workloads can also be subject to prioritization and multilevel fairshare policies, 
+which maintain correct prioritization of workloads within the same Service Level Agreement (SLA). 
+
+##### Resource Optimization
+Environments are rarely homogeneous. There might be some servers with additional memory or some might have GPGPUs or additional capabilities. 
+Running workloads on these servers that do not require those capabilities can block or delay workloads that do require additional functions. 
+LSF Technical Preview provides multiple polices such as multilevel fairshare and service level management, 
+enabling the optimization of resources based on business policy rather than by users competing for resources.
+
+**NOTE: Only one instance of the Enhanced Pod Scheduler can be deployed at a time, because it extends the Kubernetes APIs with new functions.**
+
 
 ## Details
-The LSF cluster is deployed by the LSF operator.  One operator can deploy one LSF cluster in the same namespace.  When fully deployed the following items will be created in a namespace:
+The LSF cluster is deployed by the LSF operator.  One operator can deploy one LSF cluster in the same namespace.  
+When deploying an LSF on Kubernetes cluster it will create the following items in the namespace: 
 * A LSF master pod
-* A LSF GUI pod
+* A LSF GUI pod (For LSF on Kubernetes clusters)
 * A variety of LSF compute pods (limited to 8 in CE)
-The cluster configuration supports the edition of multiple application and data directories to the pods.  The LSF cluster can also be configured to allow users to login to the LSF GUI and submit work as them selves. 
+The cluster configuration supports the edition of multiple application and data directories to the pods.  
+The LSF cluster can also be configured to allow users to login to the LSF GUI and submit work as them selves. 
+
+When deploying an Enhanced Pod Scheduler it will create the following items in the namespace: 
+* A LSF master pod
+* LSF compute pods on all available worker nodes (limited to 9 in CE)
+
 
 ## Prerequisites
 The following are needed to deploy a LSF cluster:
 * Cluster Administrator access
 * A persistent volume for LSF state storage.
-* Optional:  LDAP/NIS/YP authentication server
-* Optional:  Persistent Volumes for users home directories
-* Optional:  Persistent Volumes for application binaries
+
+For the LSF on Kubernetes clusters the following are recommended: 
+* LDAP/NIS/YP authentication server
+* Persistent Volumes for users home directories
+* Persistent Volumes for application binaries
 
 ## Resources Required
-LSF manages the resources that it is provided.  Those resources will also govern the number and size of jobs it can concurrently run.  The resources that are provided to the compute pods will be available for running jobs.  The compute pods should be as large as possible.  The minimal requirements are:
+The resources needed will depend on which type of installation is deployed.  
+For LSF on Kubernetes LSF manages the resources that it is provided.
+Those resources will also govern the number and size of jobs it can concurrently run.  
+The resources that are provided to the compute pods will be available for running jobs.
+The compute pods should be as large as possible.  The minimal requirements for a LSF on Kubernetes cluster are:
 * Operator Pod:
   - 256 MB of RAM
   - 200m of CPU
@@ -47,19 +125,39 @@ A recommended cluster would be the same except for the Compute pods where they s
 
 Production versions would use many more compute pods with even larger CPU and memory allocations. 
 
+When deploying LSF as an Enhanced Pod Scheduler the workload is Kubernetes pods, and do not run inside of the LSF Compute Pods.
+In this type of deployment the Enhanced Pod Scheduler should be deployed with minimal resources for example:
+* Operator Pod:
+  - 256 MB of RAM
+  - 200m of CPU
+* LSF Master Pod:
+  - 1 GB of RAM
+  - 1 CPU core
+* LSF Compute Pod:
+  - 1 GB of RAM
+  - 200m CPU cores
+
 
 ## Limitations
 This operator deploys LSF Community Edition (CE). CE is limited to 10 pods with no more than 64 cores per pod.
 
-No encryption of the data at rest or in motion is provided by this deployment.  It is up to the administrator to configure storage encryption and IPSEC to secure the data.
-
+No encryption of the data at rest or in motion is provided by this deployment.
+It is up to the administrator to configure storage encryption and IPSEC to secure the data.
 
 **NOTE:  The CPU resources should use the same values for the resource.request.cpu and resource.limit.cpu.  Likewise for resource.request.memory and resource.limit.memory.  This is so the pods have a guaranteed QOS.**
 
 ## PodSecurityPolicy Requirements
-The LSF cluster requires higher privileges than a simple service.  LSF must switch to the job submission users UID and GID.  To do this it requires additional privileges.  Users of IBM products that support PodSecurityPolicies (PSP) will need to use the [`ibm-privileged-psp`](https://ibm.biz/cpkspec-psp) PodSecurityPolicy.  This provides capabilities that are not needed by LSF.  The PSP below provides the minimal PSP LSF requires to run.  It is recommended to use this other than the `ibm-privileged-psp` 
+The LSF cluster requires higher privileges than a simple service.  
+LSF must switch to the job submission users UID and GID.  
+To do this it requires additional privileges.  
+Users of IBM products that support PodSecurityPolicies (PSP) will need to use the [`ibm-privileged-psp`](https://ibm.biz/cpkspec-psp) PodSecurityPolicy.  
+This provides capabilities that are not needed by LSF.  
+The PSP below provides the minimal PSP LSF requires to run.  
+It is recommended to use this other than the `ibm-privileged-psp` 
 
-Capabilities KILL, SETUID, and SETGID are necessary to become users and manage workload.  The SYS_ADMIN capability is needed to allow mode switching of GPUs.  For detection and control of GPUs on Openshift, follow the OpenShift GPU instructions. 
+Capabilities KILL, SETUID, and SETGID are necessary to become users and manage workload.  
+The SYS_ADMIN capability is needed to allow mode switching of GPUs.  
+For detection and control of GPUs on Openshift, follow the OpenShift GPU instructions. 
 
 A more restrictive PSP is given by this custom PodSecurityPolicy definition:
 ```
@@ -110,7 +208,8 @@ spec:
 ```
 
 # SecurityContextConstraints Requirements
-LSF on OpenShift requires the [`privileged`](https://ibm.biz/cpkspec-scc) Security Context Constraint (SCC), however a tighter SCC is provided below.  It is recommended instead of `privileged`.
+LSF on OpenShift requires the [`privileged`](https://ibm.biz/cpkspec-scc) Security Context Constraint (SCC), however a tighter SCC is provided below.  
+It is recommended instead of `privileged`.
 The custom SecurityContextConstraints below should be used where possible:
 ```
 # Security Context Constraint for WMLA Pod Scheduler
@@ -174,11 +273,28 @@ volumes:
 It may be downloaded from [here.](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/LSF_Operator/scc.yaml)
 
 ## Installing the Operator
-The LSF operator must be installed to install the LSF cluster.  The instructions below detail how to install the operator. 
-Once the operator is deployed the Administrator can then construct a LSFCluster specification file and use it with the operator to deploy a LSF cluster.  The following steps should be performed by the cluster administrator.  The yaml files used below are available from [here.](https://github.com/IBMSpectrumComputing/lsf-kubernetes/tree/master/doc/LSF_Operator)
+The LSF operator must be installed to install the LSF cluster.  
+Openshift users may use the Operator Catalog to install the Operator.  
+Instructions for installing on OpenShift and Kubernetes are below.
+
+### Operator Installation on OpenShift
+To install the LSF operator on OpenShift login to the GUI as a cluster administrator and perform the following steps:
+1. Create a project.  This project will be used by both the operator and the cluster deployed by it.  It is recommended that no other pods use this project.
+2. Navigate to `Operators` and then `OperatorHub`.  In the "Filter by keyword box type "LSF".  The LSF Operator will appear.
+3. Click on it and then click `Install`.  This is a technical preview.  Select the `beta` stream, and set the project to the one just created, then click `Install`.
+The operator will then be installed and the OpenShift cluster will have a Custom Resource Definition (CRD) for installing LSF clusters either as **LSF on Kubernetes** or **Enhanced Pod Scheduler** clusters.
+Once deployed the Administrator can then construct a LSFCluster specification file and use it with the operator to deploy a LSF cluster.  See below.
+
+
+### Operator Installation on Kubernetes
+The instructions below detail how to install the operator. 
+The following steps should be performed by the cluster administrator.  
+The yaml files used below are available from [here.](https://github.com/IBMSpectrumComputing/lsf-kubernetes/tree/master/doc/LSF_Operator)
+The images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/ibmcom/lsfce-operator).
    
 The following steps need to be performed manually:
-1. Create a namespace.  This namespace will be used by both the operator and the cluster deployed by it.  It is recommended that no other pods use this namespace.
+1. Create a namespace.  This namespace will be used by both the operator and the cluster deployed by it.  
+It is recommended that no other pods use this namespace.
 ```
 kubectl create namespace {Your Namespace}
 ```
@@ -220,11 +336,54 @@ kubectl create -f clusterrolebinding2.yaml
 ```
 kubectl create -f operator.yaml -n {Your Namespace}
 ```
-**NOTE: It is assumed that the Kubernetes cluster is allowed to pull images from [Docker hub.](https://hub.docker.com/r/ibmcom/lsfce-operator)  If this is not the case the images will have to be staged on an internal registry, and the operator.yaml file modified to use the alternate imagename.**
+**NOTE: It is assumed that the Kubernetes cluster is allowed to pull images from [Docker hub.](https://hub.docker.com/repository/docker/ibmcom/lsfce-operator)  If this is not the case the images will have to be staged on an internal registry, and the operator.yaml file modified to use the alternate imagename.**
 
-### Verifying the Operator is Running
+#### Moving the Images to an Internal Registry
+In the event that [Docker hub.](https://hub.docker.com/repository/docker/ibmcom/lsfce-operator) is not accessable from the Kubernetes/OpenShift cluster it will be necessary to relocate the images to an internal registry.  
+The proceedure below documents how to do that.
+1. Login to a machine that has `docker` or `podman` installed and that has unrestricted access to Docker Hub.
+2. Pull down the needed images e.g.
+``` bash
+docker pull ibmcom/lsfce-operator:1.0.1
+docker pull ibmcom/lsfce-master:10.1.0.9
+docker pull ibmcom/lsfce-comp:10.1.0.9
+docker pull ibmcom/lsfce-gui:10.1.0.9
+```
+The lsfce-gui image may be ommited if you only intend to deploy the Enhanced Pod Scheduler.
+3. Save the images e.g.
+``` bash
+docker save ibmcom/lsfce-operator:1.0.1 -o lsfce-operator-1.0.1.img
+docker save ibmcom/lsfce-master:10.1.0.9 -o lsfce-master-10.1.0.9.img
+docker save ibmcom/lsfce-comp:10.1.0.9 -o lsfce-comp-10.1.0.9.img
+docker save ibmcom/lsfce-gui:10.1.0.9 -o lsfce-gui-10.1.0.9.img
+```
+4. Move the images to a machine that has access to the internal registry
+5. Load the images e.g.
+```
+docker load -i lsfce-operator-1.0.1.img
+docker load -i lsfce-master-10.1.0.9.img
+docker load -i lsfce-comp-10.1.0.9.img
+docker load -i lsfce-gui-10.1.0.9.img
+```
+6. Tag the images with the internal registry name.  Use your registry and project name.
+```
+docker tag ibmcom/lsfce-operator:1.0.1 MyRegistry/MyProject/lsfce-operator:1.0.1
+docker tag ibmcom/lsfce-master:10.1.0.9 MyRegistry/MyProject/lsfce-master:10.1.0.9
+docker tag ibmcom/lsfce-comp:10.1.0.9 MyRegistry/MyProject/lsfce-comp:10.1.0.9
+docker tag ibmcom/lsfce-gui:10.1.0.9 MyRegistry/MyProject/lsfce-gui:10.1.0.9
+```
+7. Push the images to the internal registry.  Remember to login to this registry first.
+```
+docker push MyRegistry/MyProject/lsfce-operator:1.0.1
+docker push MyRegistry/MyProject/lsfce-master:10.1.0.9
+docker push MyRegistry/MyProject/lsfce-comp:10.1.0.9
+docker push MyRegistry/MyProject/lsfce-gui:10.1.0.9
+```
+
+#### Verify the Operator is Running
 Use the following to verify the operator is running and ready to accept requests.
-Run the following to see the operator state:
+OpenShift user can verify the operator is running by navigating to `Operators` then `Installed Operators`.  The status should be **InstallSucceeded**.
+Kubernetes users can run the following to see the operator state:
 ```
 kubectl get pods -n {Your Namespace}
 ```
@@ -237,7 +396,10 @@ If the operator is not ready in a minute check the logs by running:
 ```
   kubectl logs -c operator -n {Your Namespace} {Name of operator pod}
 ```
-A typical problem will be a missed (cluster)rolebinding
+A typical problem will be a missed (cluster)rolebinding.
+
+Once the operator is deployed the Administrator can then construct a LSFCluster specification file and use it with the operator to deploy a LSF cluster.
+
 
 ### Deleting the LSF Operator
 The LSF Operator can be deleted using the following procedure as the cluster administrator:
@@ -253,9 +415,16 @@ kubectl delete -f lsf_v1beta1_lsfcluster_crd.yaml -n {Your Namespace}
 
 **NOTE: The clusterrole, and SCC are global and may be used by other clusters.  They can only be deleted when no other LSF operators are deployed.**
 
+OpenShift users can delete the LSF operator from the GUI.
+
 ## Storage
-Persistent storage will be needed in production environments where job loss is not acceptable.  A Persistent Volume (PV) should be created before deploying the chart.  A dynamic volume is not recommended because the configuration and job state is persisted on the volume.  Consult the storage configuration documentation to setup the PV.
+A Persistent Volume (PV) should be created before deploying the chart.  
+A dynamic volume is not recommended because the configuration and job state is persisted on the volume.
+Backing up this volume backs up the cluster.
+Consult the storage configuration documentation to setup the PV.
 The sample definition below is for a NFS based persistent volume.
+Note the use of labels to identify this PV.  
+These can be used when deploying the LSF cluster to control which statically created PV to use.
 ```yaml
 apiVersion: v1
 kind: PersistentVolume
@@ -274,27 +443,36 @@ spec:
     server: 10.1.1.1
     path: "/export/stuff"
 ```
-Save the definition and replace the **server** and **path** values to match your NFS server.  Note the labels.  These are used to make sure that this volume is used with the chart deployment.  The configuration files are in this volume.
+Save the definition and replace the `server` and `path` values to match your NFS server.  
+Note the labels.  These are used to make sure that this volume is used with the chart deployment.  
+The configuration files and state information in this volume.
+
 
 ## Deploying a LSF Cluster with the LSF Operator
-Deploying the LSF cluster with the operator requires a LSF cluster specification file.  This file is structured into four parts:
-1. **Cluster** - This contains configuration for the entire cluster.  It defines the storage volume for the cluster to use for HA.  It also includes configuration for setting up user authentication, so that ordinary users can login to the LSF GUI and submit work.
+Deploying the LSF cluster with the operator requires a LSF cluster specification file.  
+Sample files are available.  Select the type of cluster you wish to deploy:
+* For **LSF on Kubernetes** clusters start with [this template.](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/LSF_Operator/example-lsf.yaml)
+* For **Enhanced Pod Scheduling** cluster start with [this template.](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/LSF_Operator/example-pod-sched.yaml)
+If Docker Hub is not accessable, and the proceedure for moving the images to an internal registry was used, then the sample templates should be edited the the `image` entries updated with the internal registry name.
+
+This file is structured into functional parts:
+1. **Cluster** - This contains configuration for the entire cluster.  The setting here are applied to all pods.  It defines the type of LSF cluster it will deploy. It defines the storage volume for the cluster to use.  For **LSF on Kubernetes** clusters it includes configuration for setting up user authentication, so that ordinary users can login to the LSF GUI and submit work, and settings for accessing additional volumes for users home directories and applications.
 2. **Master** - This provides the parameters for deploying the LSF master pod.  It has the typical controls for the image and resources along with controls to control the placement of the pod.
-3. **GUI** - This provides the parameters for deploying the LSF GUI pod.  It has the typical controls for the image and resources along with controls to control the placement of the pod.
+3. **GUI** - This provides the parameters for deploying the LSF GUI pod.  It only is used with the **LSF on Kubernetes** cluster.  It has the typical controls for the image and resources along with controls for placement of the pod.
 4. **Computes** - This is a list of LSF compute pod types.  The cluster can have more than one OS software stack.  This way the compute images can be tailored for the workload it needs to run.  Each compute type can specify the image to use, along with the number of replicas, and the type of resources that this pod supports.  For example, you might have some pods with a RHEL 7 software stack, and another with CentOS 6.  A small compute image is provided.  The sample image is based of the Red Hat UBI image.  Instructions on building your own images are [here.](https://github.com/IBMSpectrumComputing/lsf-kubernetes/tree/master/doc/LSF_Operator)
 
 
 ## Configuration
-The LSF operator uses a configuration file to deploy the LSF cluster.  A sample file can also be downloaded from [here.](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/LSF_Operator/example-lsf.yaml)
+The LSF operator uses a configuration file to deploy the LSF cluster.  Start with the sample files provided above and edit them for your specific needs.  The instructions below provide more details on how to prepare the file.
 
-Use the instructions below to modify the cluster for your needs:
-1. Change the name of the cluster:
+Use the instructions below to modify the cluster for your needs.  Edit the file.
+1. Set the name of the LSf cluster.  Here it is `example-lsfcluster`.
 ```yaml
 metadata:
   name: example-lsfcluster
 ```
 
-2. Read the licenses and indicate acceptance by setting the **licenseAccepted** flag to **true**.  The licenses are available from this site:      http://www-03.ibm.com/software/sla/sladb.nsf
+2. Read the licenses and indicate acceptance by setting the `licenseAccepted` flag to `true`.  The licenses are available from [http://www-03.ibm.com/software/sla/sladb.nsf](http://www-03.ibm.com/software/sla/sladb.nsf)
 ```yaml
 spec:
   # Indicate acceptance of the Licenses
@@ -304,13 +482,31 @@ spec:
   licenseAccepted: false
 ```
 
-3. Set the namespace to the same namespace that the operator is deployed in.
+3. Set the namespace to the same namespace that the operator is deployed in.  The `serviceAccount` can be left as is.
 ```yaml
   # Use your own namespace from the steps above
   namespace: ibm-lsf-project
 ```
 
-4. Provide the storage parameters for the LSF cluster.  Using an existing PersistentVolume (PV) is recommended.
+4. Set the type of cluster to deploy, either `lsf` or `podscheduler`.
+```yaml
+spec:
+  cluster:
+    # The operator can deploy lsf in two different modes:
+    #   lsf           - LSF is deployed as a cluster within K8s
+    #   podscheduler  - LSF enhances the pod scheduling capabilities
+    #                   of K8s.
+    lsfrole: lsf
+```
+
+5. Set the name of the cluster.  This will be used as a prefix to many of the objects the operator will create
+```yaml
+spec:
+  cluster:
+    clustername: mylsf
+```
+
+6. Provide the storage parameters for the LSF cluster.  Using an existing PersistentVolume (PV) is recommended.  If the PV was created with a specific label and label value, set them below.  If dynamic storage is to be used set `dynamicStorage` to true and specify the `storageClass`.
 ```yaml
 spec:
   cluster:
@@ -323,15 +519,16 @@ spec:
       size: "10G"
 ```
 
-5. One or more users need to be designated as LSF administrators.  These users will be able to perform LSF administrative functions using the GUI.  Provide a list of the UNIX usernames to use as administrators.
+7. For **LSF on Kubernetes** clusters one or more users need to be designated as LSF administrators.  These users will be able to perform LSF administrative functions using the GUI.  Provide a list of the UNIX usernames to use as administrators.
 ```yaml
 spec:
   cluster:
     administrators:
     - someUNIXuser
+    - someOtherUser
 ```
 
-6. The pods in the cluster will need to access user data and applications.  The **volumes** section provides a way to connect existing PVs to the LSF cluster pods.  Define PVs for the data and application binaries and add as many as needed for your site e.g.
+8. For **LSF on Kubernetes** clusters the pods in the cluster will need to access user data and applications.  The **volumes** section provides a way to connect existing PVs to the LSF cluster pods.  Define PVs for the data and application binaries and add as many as needed for your site e.g.  
 ```yaml 
     volumes:
     - name: "Home"
@@ -347,18 +544,48 @@ spec:
       accessModes: "ReadOnlyMany"
       size: ""
 ```
-7. For users to login to the LSF GUI you will need to define the configuration for the pod authentication.  Inside the pods the entrypoint script will run **authconfig** to generate the needed configuration files.  The **userauth** section allows you to:
-* Define the arguments to the authconfig command
-* Provide any configuration files needed by the authentication daemons
-* List any daemons that should be started for authentication.
+**NOTE: When creating the PVs to use as volumes in the cluster do NOT set the `Reclaim Policy` to `Recycle`.  This would cause Kubernetes to delete everything in the PV when the LSF cluster is deleted.**
+
+9. For **LSF on Kubernetes** clusters users need to login to the LSF GUI to submit work you will need to define the configuration for the pod authentication.  Inside the pods the entrypoint script will run **authconfig** to generate the needed configuration files.  The **userauth** section allows you to:
+   - Define the arguments to the authconfig command
+   - Provide any configuration files needed by the authentication daemons
+   - List any daemons that should be started for authentication.
 Edit the **userauth** section and define your configuration.  It may be necessary to test the configuration.  This can be done by logging into the master pod and running the following commands to verify that user authentication is functioning:
 ```bash
 # getent passwd
 # getent group
 ```
 When the user authentication is functioning correctly these will provide the passwd and group contents.
+```yaml
+spec:
+  cluster:
+    # This section is for configuring username resolution
+    # The pods will call "authconfig" to setup the authentication
+    # It can be used with the authentication schemes that "authconfig"
+    # supports.
+    userauth:
+      # Configs are a list of secrets that will be passed to the
+      # running pod as configuration files.  This is how to pass
+      # certificates to the authentication daemons.  The secret has
+      # a name and value and is created using:
+      #    kubectl create secret generic test-secret --from-literal=filename=filecontents
+      # The actual filename in the pod is the filename from the configs
+      # list below plus the filename from the command above.
+      configs:
+      - name: "test-secret"
+        filename: "/etc/test/test-secret"
 
-8. Placement options are provided for all of the pods.  They can be used to control where the pods will be placed.  The **includeLabel** is used to place the pods on worker nodes that have that label.  The **excludeLabel** has the opposite effect.  worker nodes that have the **excludeLabel** will not be used for running the LSF pods.  Taints can also be used to taint worker nodes so that the kube-scheduler will not normally use those worker nodes for running pods.  This can be used to grant the LSF cluster exclusive use of a worker node.  To have a worker node exclusively for the LSF cluster taint the node and use the taint name, value and effect in the placement.tolerate... section e.g.
+      # These are the arguments to invoke the "authconfig" command
+      # with.  This will generate the needed configuration files.
+      # NOTE:  The "--nostart" argument will be added.
+      authconfigargs: "--enableldap --enableldapauth --ldapserver=ldap://10.10.10.10/,ldap://10.10.10.11/ --ldapbasedn=dc=mygroup,dc=company,dc=com --update"
+
+      # List the daemons to start, e.g.  nslcd, sssd, etc
+      starts:
+      - /usr/sbin/nslcd
+```
+
+10. Placement options are provided for all of the pods.  They can be used to control where the pods will be placed.  The `includeLabel` is used to place the pods on worker nodes that have that label.  The `excludeLabel` has the opposite effect.  Worker nodes that have the `excludeLabel` will not be used for running the LSF pods.  Taints can also be used to taint worker nodes so that the kube-scheduler will not normally use those worker nodes for running pods.  This can be used to grant the LSF cluster exclusive use of a worker node.  To have a worker node exclusively for the LSF cluster taint the node and use the taint name, value and effect in the placement.tolerate... section e.g.
 ```yaml
 spec:
   master:    # The GUI and Computes have the same controls
@@ -388,15 +615,15 @@ spec:
       tolerateEffect: NoExecute
 ```
 
-9. The **image** and **imagePullPolicy** control where and how the images are pulled.  The free images are hosted on dockerhub.  If you are building your own images, or pulling from an internal registry change the **image** value to your internal registry
+11. The `image` and `imagePullPolicy` control where and how the images are pulled.  The free images are hosted on dockerhub.  If you are building your own images, or pulling from an internal registry change the `image` value to your internal registry
 ```yaml
 spec:
   master:      # The GUI and Computes will have similiar configuration
-    image: "ibmcom/lsfce-gui:10.1.0.9"
+    image: "MyRegistry/MyProject/lsfce-master:10.1.0.9"
     imagePullPolicy: "Always"
 ```
 
-10. The **resources** section defines how much memory and CPU to assign to each pod.  LSF will only use the resources provided to its pods, so the pods should be sized to allow the largest LSF job to run.  The Master and GUI pods default values are good for LSF CE, however the Computes should be much larger.  There should also be several replicas of the compute pods.
+12. The `resources` section defines how much memory and CPU to assign to each pod.  LSF will only use the resources provided to its pods, so the pods should be sized to allow the largest LSF job to run.  Conversely **Enhanced Pod Scheduler** pods are sized for the minimum resource consumption.  The defaults are good for **Enhanced Pod Scheduler**, however for **LSF on Kubernetes** clusters the `computes` `memory` and `cpu` should be increased as large as possible.  
 ```yaml
   computes:
     - name: "Name of this collection of compute pods"
@@ -412,13 +639,13 @@ spec:
       replicas: 1
 ```
 
-11. A alternate way pods can access data and applications is using the **mountList**.  This mounts the list of provided paths from the host into the pod.  The path must exist on the worker node.  This is not available on OpenShift.
+13. For **LSF on Kubernetes** clusters an alternate way pods can access data and applications is using the **mountList**.  This mounts the list of provided paths from the host into the pod.  The path must exist on the worker node.  This is not available on OpenShift.
 ```yaml
     mountList:
       - /usr/local
 ```
 
-12. The LSF GUI uses a database.  The GUI container communicates with the database container with the aid of a password.  The password is provided via a secret.  The name of the secret is provided in the LSF clsuter spec file as:
+14. For **LSF on Kubernetes** clusters the LSF GUI uses a database.  The GUI container communicates with the database container with the aid of a password.  The password is provided via a secret.  The name of the secret is provided in the LSF clsuter spec file as:
 ```yaml
 spec:
   gui:
@@ -430,7 +657,7 @@ The secret needs to be created prior to deploying the cluster.  Replace the **My
 kubectl create secret generic db-pass --from-literal=MYSQL_ROOT_PASSWORD=MyPasswordString
 ```
 
-13. The cluster can have more than one OS software stack.  This is defined in the **computes** list.  This way the compute images can be tailored for the workload it needs to run.  Each compute type can specify the image to use, along with the number of replicas, and the type of resources that this pod supports.  For example, you might have some pods with a RHEL 7 software stack, and another with CentOS 6.  A small compute image is provided.  Instructions on building your own images are [here.](https://github.com/IBMSpectrumComputing/lsf-kubernetes/tree/master/doc/LSF_Operator)  The images should be pushed to an internal registry, and the **image** files updated for that compute type.  Each compute type provides a different software stack for the applications.  The **provides** is used to construct LSF resource groups, so that a user can submit a job and request the correct software stack for the application e.g.
+15. For **LSF on Kubernetes** clusters the cluster can have more than one OS software stack.  This is defined in the `computes` list.  This way the compute images can be tailored for the workload it needs to run.  Each compute type can specify the image to use, along with the number of replicas, and the type of resources that this pod supports.  For example, you might have some pods with a RHEL 7 software stack, and another with CentOS 6.  A small compute image is provided.  Instructions on building your own images are [here.](https://github.com/IBMSpectrumComputing/lsf-kubernetes/tree/master/doc/LSF_Operator)  The images should be pushed to an internal registry, and the `image` files updated for that compute type.  Each compute type provides a different software stack for the applications.  The `provides` is used to construct LSF resource groups, so that a user can submit a job and request the correct software stack for the application e.g.
 ```yaml
 spec:
   computes:
@@ -453,7 +680,9 @@ spec:
 ```
 
 ### Deploying the Cluster
-The LSF cluster is deployed by creating an instance of a "lsfcluster".  Use the file from above to deploy the cluster e.g.
+The cluster is deployed by creating an instance of a **lsfcluster**.  Use the file from above to deploy the cluster e.g.
+OpenShift users can deploy the cluster from the GUI by providing the yaml file created in the above steps.
+Kubernetes users can use the following:
 ```bash
 kubectl create -n {Your namespace} -f example-lsf.yaml
 ```
@@ -471,6 +700,7 @@ dept-a-lsf-rhel7-55f8c44cfb-vmjz8    3/3       Running   0          4d
 dept-a-lsf-centos6-5ac8c43cfa-fdfh2  4/4       Running   0          4d
 ibm-lsf-operator-5b84545b69-mdd7r    2/2       Running   0          4d
 ```
+Only one **Enhanced Pod Scheduler** cluster can be deployed at a time.  Deploying more than one will have unpredictable effects.
 
 ## Deleting an LSF Cluster
 The LSF cluster can be deleted by running:
@@ -485,6 +715,7 @@ kubectl delete lsfcluster -n {Your namespace} {Your LSF Cluster name from above}
 
 
 ## Cluster Maintenance
+
 LSF Documentation is available [here.](https://www.ibm.com/support/knowledgecenter/SSWRJV_10.1.0/lsf_welcome/lsf_kc_cluster_ops.html)  Although hosted on Kubernetes LSF can be administrated as outlined in the documentation.  Where possible worker nodes should be tainted to prevent other services triggering eviction of an LSF pod.  Should a LSF pod be evicted the jobs running on it will be marked as failed, and users will have to re-run them. 
 
 
