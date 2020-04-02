@@ -1,4 +1,4 @@
-[![IBM Spectrum Computing Technical Preview](https://github.com/IBMSpectrumComputing/lsf-hybrid-cloud/blob/master/Spectrum_icon.png)](https://www.ibm.com/support/knowledgecenter/SSWRJV/product_welcome_spectrum_lsf.html)
+﻿[![IBM Spectrum Computing Technical Preview](https://github.com/IBMSpectrumComputing/lsf-hybrid-cloud/blob/master/Spectrum_icon.png)](https://www.ibm.com/support/knowledgecenter/SSWRJV/product_welcome_spectrum_lsf.html)
 
 # IBM Spectrum LSF Deployed as an Enhanced Pod Scheduler 
 
@@ -11,9 +11,9 @@ IBM Spectrum LSF Deployed as an **Enhanced Pod Scheduler** delivers three key ca
 * Optimizes the usage of expensive resources such as general-purpose graphics processing units (GPGPUs) to help ensure that they are allocated the most important work
 
 ### Overview
-**Enhanced Pod Scheduler** Technical Preview builds on IBM Spectrum Computings rich heritage in workload management and orchestration in demanding high performance computing and enterprise environments. With this strong foundation, **Enhanced Pod Scheduler** brings a wide range of workload management capabilities that include:
-* Multilevel priority queues and preemption
-* Fairshare among projects and namespaces
+**Enhanced Pod Scheduler** Technical Preview builds on IBM Spectrum Computing’s rich heritage in workload management and orchestration in demanding high performance computing and enterprise environments. With this strong foundation, **Enhanced Pod Scheduler** brings a wide range of workload management capabilities that include:
+* Multilevel priority queues and pre-emption
+* Fair share among projects and namespaces
 * Resource reservation
 * Dynamic load-balancing
 * Topology-aware scheduling
@@ -32,18 +32,18 @@ While the Kubernetes scheduler employs a basic “first come, first served" meth
 
 ### Key capabilities of IBM Spectrum Computing Technical Preview
 #### Workload Orchestration
-Kubernetes provides effective orchestration of workloads as long as there is capacity. 
+Kubernetes provides effective orchestration of workloads if there is capacity. 
 In the public cloud, the environment can usually be enlarged to help ensure that there is always capacity in response to workload demands. 
 However, in an on-premises deployment of Kubernetes, resources are ultimately finite. 
-For workloads that dynamically create Kubernetes pods (such as Jenkins, Jupyter Hub, Apache Spark, Tensorflow, ETL, and so on), 
-the default "first come, first served" orchestration policy is not sufficient to help ensure that important business workloads process first or get resources before less important workloads. 
+For workloads that dynamically create Kubernetes pods (such as Jenkins, Jupyter Hub, Apache Spark, TensorFlow, ETL, and so on), 
+the default "first come, first served" orchestration policy is not enough to help ensure that important business workloads process first or get resources before less important workloads. 
 **Enhanced Pod Scheduler** prioritizes access to the resources for key business processes and lower priority workloads are queued until resources can be made available.
 
 #### Service Level Management  
-In a multitenant environment where there is competition for resources, workloads (users, user groups, projects, and namespaces) can be assigned to different service levels that help ensure the right workload gets access to the right resource at the right time. This function prioritizes workloads and allocates a minimum number of resources for each service class. In addition to service levels, workloads can also be subject to prioritization and multilevel fairshare policies, which maintain correct prioritization of workloads within the same Service Level Agreement (SLA). 
+In a multitenant environment where there is competition for resources, workloads (users, user groups, projects, and namespaces) can be assigned to different service levels that help ensure the right workload gets access to the right resource at the right time. This function prioritizes workloads and allocates a minimum number of resources for each service class. In addition to service levels, workloads can also be subject to prioritization and multilevel fair share policies, which maintain correct prioritization of workloads within the same Service Level Agreement (SLA). 
 
 #### Resource Optimization
-Environments are rarely homogeneous. There might be some servers with additional memory or some might have GPGPUs or additional capabilities. Running workloads on these servers that do not require those capabilities can block or delay workloads that do require additional functions. **Enhanced Pod Scheduler** provides multiple polices such as multilevel fairshare and service level management, enabling the optimization of resources based on business policy rather than by users competing for resources.
+Environments are rarely homogeneous. There might be some servers with additional memory, or some might have GPGPUs or additional capabilities. Running workloads on these servers that do not require those capabilities can block or delay workloads that do require additional functions. **Enhanced Pod Scheduler** provides multiple polices such as multilevel fair share and service level management, enabling the optimization of resources based on business policy rather than by users competing for resources.
 
 
 # **Enhanced Pod Scheduler** Job Scheduler Spec Reference and Examples
@@ -65,7 +65,7 @@ Deploying the **Enhanced Pod Scheduler** enables job control extensions for the 
 | `++lsf.ibm.com/gpu`             | The GPU requirements for the job       | `GPU requirement (-gpu)`  |
 | `++lsf.ibm.com/queue`           | The name of the job queue to run the job in | `Queue (-q)`   |
 | `++lsf.ibm.com/jobGroup`        | The job group to put the job in        | `Job Group (-g)`  |
-| `++lsf.ibm.com/fairshareGroup`  | The fairshare group to use to share resources between jobs | `Fairshare Group (-G)`  |
+| `++lsf.ibm.com/fairshareGroup`  | The fair share group to use to share resources between jobs | `Fair share Group (-G)`  |
 | `++lsf.ibm.com/user`            | The user to run applications as, and for accounting  | `Job submission user`  |
 | `++lsf.ibm.com/reservation`     | Reserve the resources prior to running job | `Advanced Reservation (-U)`  |
 | `++lsf.ibm.com/serviceClass`    | The jobs service class                 | `Service Class (-sla)`  |
@@ -100,11 +100,11 @@ spec:
       restartPolicy: Never
 ```
 Here we have just told Kubernetes to use **lsf** as the job scheduler.  The LSF job scheduler can 
-then apply it's policies to choose when and where the job will run.
+then apply its policies to choose when and where the job will run.
 
 ### Job Scheduler Example 2
 Additional parameters can be added to the pod yaml file to control the job.  The example below adds 
-some additional annotations for controlling the job.  The `lsf.ibm.com/queue: "normal"` tells the scheduler to use the `normal` queue.  By default there are four queues available:
+some additional annotations for controlling the job.  The `lsf.ibm.com/queue: "normal"` tells the scheduler to use the `normal` queue.  By default, there are four queues available:
 - priority - This is for high priority jobs
 - normal - This is for normal jobs
 - idle - These are for jobs that can only run if there are idle resources
@@ -112,12 +112,12 @@ some additional annotations for controlling the job.  The `lsf.ibm.com/queue: "n
 
 Additional queues can be added by modifying the **lsb.queues** configMap.
 
-The `lsf.ibm.com/fairshareGroup: "gold"` tells the scheduler which fairshare group this job belongs to.  By default the following groups have been configured:
+The `lsf.ibm.com/fairshareGroup: "gold"` tells the scheduler which fair share group this job belongs to.  By default, the following groups have been configured:
 - gold
 - silver
 - bronze
 
-These groups allow the user to modify how the resources are shared.  Some groups may have a higher allocation of resources, and can use a better fairshareGroup.
+These groups allow the user to modify how the resources are shared.  Some groups may have a higher allocation of resources and can use a better fairshareGroup.
  
 ```yaml
 apiVersion: batch/v1
@@ -185,20 +185,20 @@ The ParallelJob controller daemon is responsible to create separate Pods for eac
 in the ParallelJob CRD. 
 
 The CRD supports both job-level and task-level scheduling terms which can satisfy common scheduling 
-needs over all of the Pods in the same job or individual need for each Pod. At the same time, one
-can also specify all of the Pod Spec policies for the Pod defined in the ParallelJob CRD.
+needs over all the Pods in the same job or individual need for each Pod. At the same time, one
+can also specify all the Pod Spec policies for the Pod defined in the ParallelJob CRD.
 
 ### Job level terms
 
 ParallelJob CRD supports the following job-level terms to describe the resource requirements apply for 
-all of the Pods in the same parallel job.
+all the Pods in the same parallel job.
 
 * spec.description: the human readable description words attached to the parallel job
-* spec.resizable: the valid values are "true" or "false", which determines whether the Pods in the parallel job should be co-scheduling together. Specifically, a resizable job can be started with a few Pods got enough resources, while a non-resizable job must get enough resources for all of the Pods before starting any Pods.
-* spec.headerTask: typical parallel jobs (e.g. Spark, MPI, Distributed Tensorflow) run a "driver" task to co-ordinate or work as a central sync point for the left tasks. This term can be used to specify the name of such "driver" task in a parallel job. It will make sure the header task can be scheduled and started before or at the same time with other non-header tasks.
+* spec.resizable: the valid values are "true" or "false", which determines whether the Pods in the parallel job should be co-scheduling together. Specifically, a resizable job can be started with a few Pods got enough resources, while a non-resizable job must get enough resources for all the Pods before starting any Pods.
+* spec.headerTask: typical parallel jobs (e.g. Spark, MPI, Distributed TensorFlow) run a "driver" task to co-ordinate or work as a central sync point for the left tasks. This term can be used to specify the name of such "driver" task in a parallel job. It will make sure the header task can be scheduled and started before or at the same time with other non-header tasks.
 * spec.placement: this term supports multiple sub-terms which can satisfy various task distribution policies, such as co-allocating multiple tasks on the same host or zone, or evenly distribute the same number of tasks across allocated hosts. This term can be defined in both job-level and task-group level.
 
-Currently, this term supports the following placement policies. The example defines a "same" policy in job-level to enforce all of the tasks belong to the parallel job co-allocated to the nodes in the same zone. 
+Currently, this term supports the following placement policies. The example defines a "same" policy in job-level to enforce all the tasks belong to the parallel job co-allocated to the nodes in the same zone. 
 
 ```
 sameTerm: node | rack | zone
@@ -206,7 +206,7 @@ spanTerms:
 - topologyKey: node
   taskTile: #tasks_per_topology 
 ```
-To use the topology keys, you must define the following host based resources in your LSF configuration files. Examples are as follows.
+To use the topology keys, you must define the following host-based resources in your LSF configuration files. Examples are as follows.
 
 lsf.shared:
 
@@ -238,11 +238,11 @@ The tasks are grouped by the common resource requirements of replicas.
 * spec.taskGroups[].spec.replica: this term defines the number of tasks in current task group
 * spec.taskGroups[].spec.placement: this term shares the same syntax with the one defined at job level. 
 The second task group in the example defines an alternative "span" like placement policy, which can either put 4 replicas across two nodes or on the same node.
-* spec.taskGroups[].spec.template.spec: the Pod Spec shares the same syntax supported by your K8s cluster. For example, you can specify the nodeSelector to fiter node lables during scheduling.
+* spec.taskGroups[].spec.template.spec: the Pod Spec shares the same syntax supported by your K8s cluster. For example, you can specify the nodeSelector to filter node labels during scheduling.
 
 ### LSF specific annotations
 
-The annotations defined at job-level can support job control extensions with prefix of "lsf.ibm.com/" listed in [here](#Job-Scheduler-Spec-Reference). The resource requirements conflict of the following extensions are described as follows.
+The annotations defined at job-level can support job control extensions with prefix of "lsf.ibm.com/" listed in [here](#Job-Scheduler-Spec-Reference). The resource requirements conflict of the following extensions is described as follows.
 
 * lsf.ibm.com/gpu: Number of GPUs to be requested on each host (-gpu). This term will be ignored when the Pod explicitly request nvidia.com/gpu resource in ParallelJob CRD.
 * lsf.ibm.com/minCurrent: Not supported by ParallelJob CRD. All of replicas must get allocation at the same time for non-resizable job. For resizable job, once header task got allocation, the job can be started no matter whether other tasks can get allocation at
@@ -439,7 +439,7 @@ Changing the scheduler configuration requires:
 * Changing the configuration file(s)
 * Reconfiguring the scheduler
 
-To connect the manager pod use the following procedure:
+To connect the manager pod, use the following procedure:
 1. Locate the master pod by looking for **master** in the list of pods e.g.
 ```
 $ kubectl get pods --namespace {Namespace used to deploy chart} |grep ibm-spectrum-computing-prod-master
@@ -501,7 +501,7 @@ To reconfigure the base on all nodes use:
 LSF POD [root@lsfmaster /]# lsadmin reconfig all
 ```
 
-2. Run the command to re-read the schduler configuration.
+2. Run the command to re-read the scheduler configuration.
 ```
 LSF POD [root@lsfmaster /]# badmin mbdrestart
 
@@ -601,4 +601,5 @@ LSF POD [root@lsfmaster /]# badmin qopen {Name of Queue}
 © Copyright IBM Corporation 2019
 U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 IBM®, the IBM logo and ibm.com® are trademarks of International Business Machines Corp., registered in many jurisdictions worldwide. Other product and service names might be trademarks of IBM or other companies. A current list of IBM trademarks is available on the Web at "Copyright and trademark information" at [www.ibm.com/legal/copytrade.shtml](https://www.ibm.com/legal/copytrade.shtml).
+
 
