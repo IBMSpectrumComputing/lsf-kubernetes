@@ -65,6 +65,7 @@ The following are needed to deploy an LSF cluster:
 * Cluster Administrator access
 * A persistent volume for LSF state storage.
 
+For the LSF on Kubernetes clusters a secret is needed for storing the database password.
 For the LSF on Kubernetes clusters the following are recommended: 
 * LDAP/NIS/YP authentication server
 * Persistent Volumes for users home directories
@@ -441,7 +442,7 @@ spec:
     clustername: mylsf
 ```
 
-6. Provide the storage parameters for the LSF cluster.  Using an existing PersistentVolume (PV) is recommended.  If the PV was created with a specific label and label value, set them below.  If dynamic storage is to be used set `dynamicStorage` to true and specify the `storageClass`.
+6. Provide the storage parameters for the LSF cluster.  Using an existing PersistentVolume (PV) is recommended.  Label the PV with your own label and label value, and use the label as the `selectorLabel` below, and the the label value as the `selectorValue` below.  If dynamic storage is to be used set `dynamicStorage` to true and specify the `storageClass`.
 ```yaml
 spec:
   cluster:
@@ -591,6 +592,7 @@ The secret needs to be created prior to deploying the cluster.  Replace the **My
 ```bash
 kubectl create secret generic db-pass --from-literal=MYSQL_ROOT_PASSWORD=MyPasswordString
 ```
+If using the OpenShift GUI create a Key/Value secret by setting the secret name, and using the key `MYSQL_ROOT_PASSWORD`.  The value must be provided from a file that has the value in it.
 
 15. For **LSF on Kubernetes** clusters the cluster can have more than one OS software stack.  This is defined in the `computes` list.  This way the compute images can be tailored for the workload it needs to run.  Each compute type can specify the image to use, along with the number of replicas, and the type of resources that this pod supports.  For example, you might have some pods with a RHEL 7 software stack, and another with CentOS 6.  A small compute image is provided.  Instructions on building your own images are [here.](https://github.com/IBMSpectrumComputing/lsf-kubernetes/tree/master/doc/LSF_Operator)  The images should be pushed to an internal registry, and the `image` files updated for that compute type.  Each compute type provides a different software stack for the applications.  The `provides` is used to construct LSF resource groups, so that a user can submit a job and request the correct software stack for the application e.g.
 ```yaml
@@ -665,6 +667,7 @@ Either:
 - The operator is polling for changes and has not woke up yet.  Give it 30 seconds.
 - The operator has failed to initialize.  Run: **oc logs -c operator {Operator Pod}**
 
+Another common issue is forgetting to create the database secret.  When this happens the GUI pod in the LSF on Kubernetes cluster will be stuck in a pending state.  To resolve it create the secret and re-create the cluster.
 
 ## Deleting an LSF Cluster
 The LSF cluster can be deleted by running:
