@@ -95,6 +95,7 @@ rules:
   - extensions
   resources:
   - ingresses
+  - networkpolicies
   verbs:
   - get
   - list
@@ -108,6 +109,16 @@ rules:
   - rolebindings
   - clusterroles
   - clusterrolebindings
+  verbs:
+  - list
+  - get
+  - create
+  - patch
+  - update
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - networkpolicies
   verbs:
   - list
   - get

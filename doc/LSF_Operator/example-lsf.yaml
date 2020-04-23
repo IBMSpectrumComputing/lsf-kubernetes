@@ -21,9 +21,6 @@ spec:
   # Use the search option to find IBM Spectrum LSF CE
   licenseAccepted: false
 
-  # The namespace to deploy in.  Use the same namespace as the LSF operator
-  namespace: ibm-lsf-project
-
   # Provide the name of the service account you wish to use
   serviceAccount: my-new-sa
 

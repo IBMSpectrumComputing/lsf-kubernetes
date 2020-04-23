@@ -22,9 +22,6 @@ spec:
   # Indicate acceptance of the Licenses
   licenseAccepted: false
 
-  # The namespace to deploy in.  Use the same namespace as the LSF operator
-  namespace: ibm-lsf-project
-
   # Provide the name of the service account you wich to use
   serviceAccount: ibm-lsf-sa
 
