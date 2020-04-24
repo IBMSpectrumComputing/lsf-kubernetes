@@ -93,14 +93,27 @@ rules:
   - '*'
 - apiGroups:
   - extensions
+  - networking.k8s.io
+  - crd.projectcalico.org
   resources:
-  - ingresses
   - networkpolicies
   verbs:
   - get
   - list
   - create
   - patch
+  - update
+- apiGroups:
+  - extensions
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - create
+  - patch
+  - update
 # Needed to create the role
 - apiGroups:
   - rbac.authorization.k8s.io

@@ -46,6 +46,7 @@ rules:
   - ibm.com
   resources:
   - paralleljobs
+  - resourceplans
   verbs:
   - "*"
 - apiGroups:
