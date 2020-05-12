@@ -43,7 +43,7 @@ spec:
       size: "10G"
 
   master:
-    image: "ibmcom/lsfce-master:10.1.0.9"
+    image: "ibmcom/lsfce-master:10.1.0.9r02"
     imagePullPolicy: "Always"
 
     # The placement variables control how the pods will be placed
@@ -95,7 +95,7 @@ spec:
     - name: "RHEL7"
 
       # Define where to get the image from
-      image: "ibmcom/lsfce-comp:10.1.0.9" 
+      image: "ibmcom/lsfce-comp:10.1.0.9r02" 
       imagePullPolicy: "Always"
 
       # The placement variables control how the pods will be placed

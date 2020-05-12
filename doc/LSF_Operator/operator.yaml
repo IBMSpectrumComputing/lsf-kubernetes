@@ -59,7 +59,7 @@ spec:
           - /tmp/ansible-operator/runner
           - stdout
           # Replace this with the built image name
-          image: "ibmcom/lsfce-operator:1.0.1"
+          image: "ibmcom/lsfce-operator:1.0.1r02"
           imagePullPolicy: "Always"
           volumeMounts:
           - mountPath: /tmp/ansible-operator/runner
@@ -99,7 +99,7 @@ spec:
             readOnlyRootFilesystem: false
         - name: operator
           # Replace this with the built image name
-          image: "ibmcom/lsfce-operator:1.0.1"
+          image: "ibmcom/lsfce-operator:1.0.1r02"
           imagePullPolicy: "Always"
           volumeMounts:
           - mountPath: /tmp/ansible-operator/runner
