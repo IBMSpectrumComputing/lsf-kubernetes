@@ -80,11 +80,11 @@ spec:
     # to get a guarenteed QoS.
     resources:
       requests:
-        cpu: "1"
-        memory: "1G"
+        cpu: "4"
+        memory: "8G"
       limits:
-        cpu: "1"
-        memory: "1G"
+        cpu: "4"
+        memory: "8G"
 
   # There can be a number of different compute pods running.  Each pod
   # type supporting different applications.  Define a list of compute

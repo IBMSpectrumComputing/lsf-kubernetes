@@ -97,8 +97,8 @@ When deploying LSF as an Enhanced Pod Scheduler the workload is Kubernetes pods,
   - 256 MB of RAM
   - 200m of CPU
 * LSF Master Pod:
-  - 1 GB of RAM
-  - 1 CPU core
+  - 8 GB of RAM
+  - 4 CPU core
 * LSF Compute Pod:
   - 1 GB of RAM
   - 200m CPU cores
