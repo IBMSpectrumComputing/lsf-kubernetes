@@ -31,7 +31,7 @@ for i in $(seq 1 $NUMJOBS); do
    sed -i -s s:FSGRP:${FSGRP}:g jobtmp/sharepod-${FSGRP}-$i.yaml
    kubectl create -f jobtmp/sharepod-${FSGRP}-$i.yaml
 
-   # Create a Bronze job
+   # Create a Silver job
    FSGRP=silver
    sed -e s:SEQ:$i:g < $TEMPLATE > jobtmp/sharepod-${FSGRP}-$i.yaml
    sed -i -s s:FSGRP:${FSGRP}:g jobtmp/sharepod-${FSGRP}-$i.yaml
