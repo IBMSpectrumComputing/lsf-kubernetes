@@ -111,59 +111,6 @@ No encryption of the data at rest or in motion is provided by this deployment.  
 
 **NOTE:  The CPU resources should use the same values for the resource.request.cpu and resource.limit.cpu.  Likewise for resource.request.memory and resource.limit.memory.  This is so the pods have a guaranteed QOS.**
 
-## PodSecurityPolicy Requirements
-The LSF cluster requires higher privileges than a simple service.  LSF must switch to the job submission users UID and GID.  To do this it requires additional privileges.  Users of IBM products that support PodSecurityPolicies (PSP) will need to use the [`ibm-privileged-psp`](https://ibm.biz/cpkspec-psp) PodSecurityPolicy.  This provides capabilities that are not needed by LSF.  The PSP below provides the minimal PSP LSF requires to run.  It is recommended to use this other than the `ibm-privileged-psp` 
-
-Capabilities KILL, SETUID, and SETGID are necessary to become users and manage workload.  The SYS_ADMIN capability is needed to allow mode switching of GPUs.  For detection and control of GPUs on Openshift, follow the OpenShift GPU instructions. 
-
-A more restrictive PSP is given by this custom PodSecurityPolicy definition:
-```
-apiVersion: extensions/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  annotations:
-    kubernetes.io/description: "This policy allows pods to run with any
-      UID and GID, and run some ioctl commands.
-      Only for use with LSF clusters."
-  name: ibm-lsf-psp
-spec:
-  allowPrivilegeEscalation: true
-  fsGroup:
-    rule: RunAsAny
-  requiredDropCapabilities:
-  - MKNOD
-  - NET_RAW
-  - SYS_CHROOT
-  - SETFCAP
-  - AUDIT_WRITE
-  - FOWNER
-  - FSETID
-  allowedCapabilities:
-  - KILL
-  - SETUID
-  - SETGID
-  - CHOWN
-  - SETPCAP
-  - NET_BIND_SERVICE
-  - DAC_OVERRIDE
-  - SYS_ADMIN
-  - SYS_TTY_CONFIG
-  runAsUser:
-    rule: RunAsAny
-  seLinux:
-    rule: RunAsAny
-  supplementalGroups:
-    rule: RunAsAny
-  volumes:
-  - '*'
-  hostIPC: false
-  hostNetwork: false
-  hostPID: false
-  hostPorts:
-  - max: 65535
-    min: 0
-```
-
 # SecurityContextConstraints Requirements
 LSF on OpenShift requires the [`privileged`](https://ibm.biz/cpkspec-scc) Security Context Constraint (SCC), however a tighter SCC is provided below.  It is recommended instead of `privileged`.  The custom SecurityContextConstraints below should be used where possible:
 ```
@@ -228,18 +175,9 @@ volumes:
 It may be downloaded from [here.](https://github.com/IBMSpectrumComputing/lsf-kubernetes/blob/master/doc/LSF_Operator/scc.yaml)
 
 ## Installing the Operator
-The LSF operator must be installed to install the LSF cluster.  OpenShift users may use the Operator Catalog to install the Operator.  Instructions for installing on OpenShift and Kubernetes are below.
+The LSF operator must be installed to install the LSF cluster.  Instructions for installing on OpenShift and Kubernetes are below.
 
-### Operator Installation on OpenShift
-To install the LSF operator on OpenShift login to the GUI as a cluster administrator and perform the following steps:
-1. Create a project.  This project will be used by both the operator and the cluster deployed by it.  It is recommended that no other pods use this project.
-2. Navigate to `Operators` and then `OperatorHub`.  In the "Filter by keyword box type "LSF".  The LSF Operator will appear.
-3. Click on it and then click `Install`.  This is a technical preview.  Select the `beta` stream, and set the project to the one just created, then click `Install`.
-The operator will then be installed and the OpenShift cluster will have a Custom Resource Definition (CRD) for installing LSF clusters either as **LSF on Kubernetes** or **Enhanced Pod Scheduler** clusters.  Once deployed the Administrator can then construct a LSFCluster specification file and use it with the operator to deploy an LSF cluster.  See below.
-
-
-### Operator Installation on Kubernetes
-The instructions below detail how to install the operator.  The following steps should be performed by the cluster administrator.  The yaml files used below are available from [here.](https://github.com/IBMSpectrumComputing/lsf-kubernetes/tree/master/doc/LSF_Operator)  The images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/ibmcom/lsfce-operator).
+The following steps should be performed by the cluster administrator.  The yaml files used below are available from [here.](https://github.com/IBMSpectrumComputing/lsf-kubernetes/tree/master/doc/LSF_Operator)  The images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/ibmcom/lsfce-operator).
    
 The following steps need to be performed manually:
 1. Create a namespace.  This namespace will be used by both the operator and the cluster deployed by it.  
